@@ -1,0 +1,44 @@
+services:
+  # Development services
+  postgres:
+    image: postgres:16.3
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: magic_recipe
+      POSTGRES_PASSWORD: "iFB28yQfxF6kfEEEMeIM5m86d5u_d2xQ"
+    volumes:
+      - magic_recipe_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "4GAYC61ZL5IOWDrc_inrT2ntGjVc36At"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  # Test services
+  postgres_test:
+    image: postgres:16.3
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: magic_recipe_test
+      POSTGRES_PASSWORD: "dk3mjJzX7zpz31GCkjcomDR3XpG5wenM"
+    volumes:
+      - magic_recipe_test_data:/var/lib/postgresql/data
+
+  redis_test:
+    image: redis:6.2.6
+    ports:
+      - "9091:6379"
+    command: redis-server --requirepass "pAu8M_4Ru1SFyX9ccMGL1rccEXVEiiIL"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+volumes:
+  magic_recipe_data:
+  magic_recipe_test_data:
