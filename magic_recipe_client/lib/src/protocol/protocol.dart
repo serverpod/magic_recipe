@@ -12,6 +12,7 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'greeting.dart' as _i2;
 import 'recipes/recipe.dart' as _i3;
+import 'package:magic_recipe_client/src/protocol/recipes/recipe.dart' as _i4;
 export 'greeting.dart';
 export 'recipes/recipe.dart';
 export 'client.dart';
@@ -40,6 +41,10 @@ class Protocol extends _i1.SerializationManager {
     }
     if (t == _i1.getType<_i3.Recipe?>()) {
       return (data != null ? _i3.Recipe.fromJson(data) : null) as T;
+    }
+    if (t == List<_i4.Recipe>) {
+      return (data as List).map((e) => deserialize<_i4.Recipe>(e)).toList()
+          as T;
     }
     return super.deserialize<T>(data, t);
   }
