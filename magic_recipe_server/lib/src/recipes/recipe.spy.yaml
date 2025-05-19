@@ -1,4 +1,5 @@
 class: Recipe
+table: recipe
 fields:
     author: String
     text: String
