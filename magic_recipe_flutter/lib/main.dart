@@ -55,7 +55,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   /// Holds the last result or null if no result exists yet.
-  String? _resultMessage;
+  Recipe? _recipe;
 
   /// Holds the last error message that we've received from the server or null if no
   /// error exists yet.
@@ -69,20 +69,20 @@ class MyHomePageState extends State<MyHomePage> {
     try {
       setState(() {
         _errorMessage = null;
-        _resultMessage = null;
+        _recipe = null;
         _loading = true;
       });
       final result =
           await client.recipes.generateRecipe(_textEditingController.text);
       setState(() {
         _errorMessage = null;
-        _resultMessage = result;
+        _recipe = result;
         _loading = false;
       });
     } catch (e) {
       setState(() {
         _errorMessage = '$e';
-        _resultMessage = null;
+        _recipe = null;
         _loading = false;
       });
     }
@@ -119,7 +119,9 @@ class MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: SingleChildScrollView(
                 child: ResultDisplay(
-                  resultMessage: _resultMessage,
+                  resultMessage: _recipe != null
+                      ? '${_recipe?.author} on ${_recipe?.date}:\n${_recipe?.text}'
+                      : null,
                   errorMessage: _errorMessage,
                 ),
               ),
