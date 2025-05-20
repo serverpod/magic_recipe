@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 8090,
+            "driver": "PostgreSQL",
+            "name": "magic_recipe",
+            "database": "magic_recipe",
+            "username": "postgres",
+            "password": "iFB28yQfxF6kfEEEMeIM5m86d5u_d2xQ"
+        }
+    ]
+}
