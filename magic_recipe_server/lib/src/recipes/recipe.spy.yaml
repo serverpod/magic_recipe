@@ -6,4 +6,5 @@ fields:
     ### The creation date of the recipe
     date: DateTime
     ingredients: String
-    
+    ### If the recipe was deleted, we store the date it was deleted
+    deletedAt: DateTime?, scope=serverOnly

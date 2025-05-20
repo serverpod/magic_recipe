@@ -128,6 +128,18 @@ class MyHomePageState extends State<MyHomePage> {
                         _recipe = recipe;
                       });
                     },
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () async {
+                        // Delete the recipe from the database
+                        await client.recipes.deleteRecipe(recipe.id!);
+                        setState(
+                          () {
+                            _recipeHistory.removeAt(index);
+                          },
+                        );
+                      },
+                    ),
                   );
                 },
               ),
