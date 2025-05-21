@@ -20,6 +20,7 @@ abstract class Recipe implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required this.ingredients,
     this.deletedAt,
     this.userId,
+    this.imagePath,
   });
 
   factory Recipe({
@@ -30,6 +31,7 @@ abstract class Recipe implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required String ingredients,
     DateTime? deletedAt,
     int? userId,
+    String? imagePath,
   }) = _RecipeImpl;
 
   factory Recipe.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -43,6 +45,7 @@ abstract class Recipe implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
       userId: jsonSerialization['userId'] as int?,
+      imagePath: jsonSerialization['imagePath'] as String?,
     );
   }
 
@@ -68,6 +71,9 @@ abstract class Recipe implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   /// The user id of the user who created the recipe
   int? userId;
 
+  /// Image path of the user upload
+  String? imagePath;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -82,6 +88,7 @@ abstract class Recipe implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     String? ingredients,
     DateTime? deletedAt,
     int? userId,
+    String? imagePath,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -93,6 +100,7 @@ abstract class Recipe implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'ingredients': ingredients,
       if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
       if (userId != null) 'userId': userId,
+      if (imagePath != null) 'imagePath': imagePath,
     };
   }
 
@@ -104,6 +112,7 @@ abstract class Recipe implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'text': text,
       'date': date.toJson(),
       'ingredients': ingredients,
+      if (imagePath != null) 'imagePath': imagePath,
     };
   }
 
@@ -148,6 +157,7 @@ class _RecipeImpl extends Recipe {
     required String ingredients,
     DateTime? deletedAt,
     int? userId,
+    String? imagePath,
   }) : super._(
           id: id,
           author: author,
@@ -156,6 +166,7 @@ class _RecipeImpl extends Recipe {
           ingredients: ingredients,
           deletedAt: deletedAt,
           userId: userId,
+          imagePath: imagePath,
         );
 
   /// Returns a shallow copy of this [Recipe]
@@ -170,6 +181,7 @@ class _RecipeImpl extends Recipe {
     String? ingredients,
     Object? deletedAt = _Undefined,
     Object? userId = _Undefined,
+    Object? imagePath = _Undefined,
   }) {
     return Recipe(
       id: id is int? ? id : this.id,
@@ -179,6 +191,7 @@ class _RecipeImpl extends Recipe {
       ingredients: ingredients ?? this.ingredients,
       deletedAt: deletedAt is DateTime? ? deletedAt : this.deletedAt,
       userId: userId is int? ? userId : this.userId,
+      imagePath: imagePath is String? ? imagePath : this.imagePath,
     );
   }
 }
@@ -209,6 +222,10 @@ class RecipeTable extends _i1.Table<int?> {
       'userId',
       this,
     );
+    imagePath = _i1.ColumnString(
+      'imagePath',
+      this,
+    );
   }
 
   late final _i1.ColumnString author;
@@ -226,6 +243,9 @@ class RecipeTable extends _i1.Table<int?> {
   /// The user id of the user who created the recipe
   late final _i1.ColumnInt userId;
 
+  /// Image path of the user upload
+  late final _i1.ColumnString imagePath;
+
   @override
   List<_i1.Column> get columns => [
         id,
@@ -235,6 +255,7 @@ class RecipeTable extends _i1.Table<int?> {
         ingredients,
         deletedAt,
         userId,
+        imagePath,
       ];
 }
 
