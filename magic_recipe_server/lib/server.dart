@@ -1,4 +1,5 @@
 import 'package:magic_recipe_server/src/birthday_reminder.dart';
+import 'package:magic_recipe_server/src/recipes/remove_deleted_recipes_future_call.dart';
 import 'package:serverpod/serverpod.dart';
 
 import 'package:magic_recipe_server/src/web/routes/root.dart';
@@ -67,6 +68,17 @@ void run(List<String> args) async {
     FutureCallNames.birthdayReminder.name,
   );
 
+  pod.registerFutureCall(
+    ReschedulingRemoveDeletedRecipesFutureCall(),
+    FutureCallNames.rescheduleRemoveDeletedRecipes.name,
+  );
+/*
+  await pod.futureCallWithDelay(
+    FutureCallNames.rescheduleRemoveDeletedRecipes.name,
+    null,
+    Duration(seconds: 5),
+  );
+*/
   // You can schedule future calls for a later time during startup. But you can also
   // schedule them in any endpoint or webroute through the session object.
   // there is also [futureCallAtTime] if you want to schedule a future call at a
@@ -88,4 +100,5 @@ void run(List<String> args) async {
 /// typos and make it easier to refactor the code.
 enum FutureCallNames {
   birthdayReminder,
+  rescheduleRemoveDeletedRecipes,
 }

@@ -41,6 +41,26 @@ class EndpointAdmin extends _i1.EndpointRef {
         'unblockUser',
         {'userId': userId},
       );
+
+  _i2.Future<void> triggerDeletedRecipeCleanup() =>
+      caller.callServerEndpoint<void>(
+        'admin',
+        'triggerDeletedRecipeCleanup',
+        {},
+      );
+
+  _i2.Future<void> scheduleDeletedRecipeCleanup() =>
+      caller.callServerEndpoint<void>(
+        'admin',
+        'scheduleDeletedRecipeCleanup',
+        {},
+      );
+
+  _i2.Future<void> stopCleanupTask() => caller.callServerEndpoint<void>(
+        'admin',
+        'stopCleanupTask',
+        {},
+      );
 }
 
 /// This is an example endpoint that returns a greeting message through its [hello] method.
