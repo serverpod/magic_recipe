@@ -1,3 +1,7 @@
+admin:
+  - listUsers:
+  - blockUser:
+  - unblockUser:
 greeting:
   - hello:
 recipes:

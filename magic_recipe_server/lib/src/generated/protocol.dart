@@ -69,6 +69,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: true,
           dartType: 'DateTime?',
         ),
+        _i2.ColumnDefinition(
+          name: 'userId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -109,6 +115,10 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i1.getType<_i5.Recipe?>()) {
       return (data != null ? _i5.Recipe.fromJson(data) : null) as T;
+    }
+    if (t == List<_i3.UserInfo>) {
+      return (data as List).map((e) => deserialize<_i3.UserInfo>(e)).toList()
+          as T;
     }
     if (t == List<_i6.Recipe>) {
       return (data as List).map((e) => deserialize<_i6.Recipe>(e)).toList()
