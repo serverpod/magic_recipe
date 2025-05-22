@@ -358,6 +358,42 @@ class _RecipesEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
+  _i3.Stream<_i6.Recipe> generateRecipeStream(
+    _i1.TestSessionBuilder sessionBuilder,
+    String ingredients, [
+    String? imagePath,
+  ]) {
+    var _localTestStreamManager = _i1.TestStreamManager<_i6.Recipe>();
+    _i1.callStreamFunctionAndHandleExceptions(
+      () async {
+        var _localUniqueSession =
+            (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          endpoint: 'recipes',
+          method: 'generateRecipeStream',
+        );
+        var _localCallContext =
+            await _endpointDispatch.getMethodStreamCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'recipes',
+          methodName: 'generateRecipeStream',
+          arguments: {
+            'ingredients': ingredients,
+            'imagePath': imagePath,
+          },
+          requestedInputStreams: [],
+          serializationManager: _serializationManager,
+        );
+        await _localTestStreamManager.callStreamMethod(
+          _localCallContext,
+          _localUniqueSession,
+          {},
+        );
+      },
+      _localTestStreamManager.outputStreamController,
+    );
+    return _localTestStreamManager.outputStreamController.stream;
+  }
+
   _i3.Future<_i6.Recipe> generateRecipe(
     _i1.TestSessionBuilder sessionBuilder,
     String ingredients, [

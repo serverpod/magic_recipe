@@ -87,6 +87,20 @@ class EndpointRecipes extends _i1.EndpointRef {
   @override
   String get name => 'recipes';
 
+  _i2.Stream<_i5.Recipe> generateRecipeStream(
+    String ingredients, [
+    String? imagePath,
+  ]) =>
+      caller.callStreamingServerEndpoint<_i2.Stream<_i5.Recipe>, _i5.Recipe>(
+        'recipes',
+        'generateRecipeStream',
+        {
+          'ingredients': ingredients,
+          'imagePath': imagePath,
+        },
+        {},
+      );
+
   _i2.Future<_i5.Recipe> generateRecipe(
     String ingredients, [
     String? imagePath,

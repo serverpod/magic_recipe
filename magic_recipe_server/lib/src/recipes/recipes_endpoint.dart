@@ -13,9 +13,106 @@ var generateContent =
         ))
             .text;
 
+@visibleForTesting
+var generateContentStream = (String apiKey, List<Content> prompt) async* {
+  await for (final message in GenerativeModel(
+    model: 'gemini-1.5-flash-latest',
+    apiKey: apiKey,
+  ).generateContentStream(
+    prompt,
+  )) {
+    if (message.text != null) {
+      yield message.text!;
+    }
+  }
+};
+
 class RecipesEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
+
+  Stream<Recipe> generateRecipeStream(Session session, String ingredients,
+      [String? imagePath]) async* {
+    final geminiApiKey = session.passwords['gemini'];
+
+    if (geminiApiKey == null) {
+      throw Exception('Gemini API key not found');
+    }
+
+    final cacheKey = 'recipe-${ingredients.hashCode}-$imagePath';
+    final cachedRecipe = await session.caches.local.get<Recipe>(cacheKey);
+
+    if (cachedRecipe != null) {
+      final userId = (await session.authenticated)?.userId;
+      session.log('Recipe found in cache for ingredients: $ingredients');
+      cachedRecipe.userId = userId;
+
+      final recipeWithId = await Recipe.db
+          .insertRow(session, cachedRecipe.copyWith(userId: userId));
+
+      yield recipeWithId;
+      return;
+    }
+
+    final List<Content> prompt = [];
+    if (imagePath != null) {
+      final imageData = await session.storage
+          .retrieveFile(storageId: 'public', path: imagePath);
+
+      if (imageData == null) {
+        throw Exception('Image not found');
+      }
+
+      prompt.add(
+        Content.data(
+          'image/jpeg',
+          imageData.buffer.asUint8List(),
+        ),
+      );
+      prompt.add(Content.text('''
+Generate a recipe using the detected ingeredients. Always put the title
+of the recipe in the first line, and then the instructions. The recipe
+should be easy to follow and include all necessary steps. Please provide
+a detailed recipe. Only put the title in the first line, no markup.'''));
+    }
+
+    // A prompt to generate a recipe, the user will provide a free text input with the ingredients
+    final textPrompt =
+        'Generate a recipe using the following ingredients: $ingredients, always put the title '
+        'of the recipe in the first line, and then the instructions. The recipe should be easy '
+        'to follow and include all necessary steps. Please provide a detailed recipe.';
+
+    if (prompt.isEmpty) {
+      prompt.add(Content.text(textPrompt));
+    }
+
+    final responseTextStream =
+        await generateContentStream(geminiApiKey, prompt);
+
+    final userId = (await session.authenticated)?.userId;
+
+    Recipe recipe = Recipe(
+      author: 'Gemini',
+      text: '',
+      date: DateTime.now(),
+      ingredients: ingredients,
+      imagePath: imagePath,
+    );
+
+    await for (final responseText in responseTextStream) {
+      recipe = recipe.copyWith(text: recipe.text + responseText);
+      session.log('Streaming update: $responseText');
+      yield recipe;
+    }
+
+    await session.caches.local
+        .put(cacheKey, recipe, lifetime: const Duration(days: 1));
+
+    final recipeWithId =
+        await Recipe.db.insertRow(session, recipe.copyWith(userId: userId));
+
+    yield recipeWithId;
+  }
 
   Future<Recipe> generateRecipe(Session session, String ingredients,
       [String? imagePath]) async {
