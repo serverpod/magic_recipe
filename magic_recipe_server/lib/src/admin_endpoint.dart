@@ -37,6 +37,7 @@ class AdminEndpoint extends Endpoint {
       FutureCallNames.rescheduleRemoveDeletedRecipes.name,
       null,
       Duration(seconds: 5),
+      identifier: FutureCallNames.rescheduleRemoveDeletedRecipes.name,
     );
   }
 

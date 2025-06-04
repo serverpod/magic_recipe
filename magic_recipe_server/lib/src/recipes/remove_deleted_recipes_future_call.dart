@@ -41,6 +41,7 @@ class ReschedulingRemoveDeletedRecipesFutureCall extends FutureCall {
       FutureCallNames.rescheduleRemoveDeletedRecipes.name,
       null,
       Duration(minutes: 5),
+      identifier: FutureCallNames.rescheduleRemoveDeletedRecipes.name,
     );
     session
         .log('Rescheduled future call to remove deleted recipes in 5 minutes');
