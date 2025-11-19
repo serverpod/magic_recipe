@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:magic_recipe_server/src/birthday_reminder.dart';
 import 'package:serverpod/serverpod.dart';
 
 import 'package:magic_recipe_server/src/web/routes/root.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
+import 'package:serverpod_auth_idp_server/providers/email.dart';
 
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
@@ -14,7 +15,50 @@ import 'src/generated/endpoints.dart';
 
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(args, Protocol(), Endpoints());
+  final pod = Serverpod(
+    args,
+    Protocol(),
+    Endpoints(),
+  );
+
+  // Configure our token managers.
+  final authSessionsConfig = AuthSessionsConfig(
+    sessionKeyHashPepper: pod.getPassword('authSessionsSessionKeyHashPepper')!,
+  );
+
+  final emailIDPConfig = EmailIDPConfig(
+    secretHashPepper: pod.getPassword('emailSecretHashPepper')!,
+    sendRegistrationVerificationCode: (
+      session, {
+      required accountRequestId,
+      required email,
+      required transaction,
+      required verificationCode,
+    }) {
+      session.log('Registration verification code: $verificationCode');
+    },
+    sendPasswordResetVerificationCode: (
+      session, {
+      required email,
+      required passwordResetRequestId,
+      required transaction,
+      required verificationCode,
+    }) async {
+      session.log('Password reset verification code: $verificationCode');
+    },
+  );
+
+  final userProfileConfig = UserProfileConfig();
+
+  final authServices = AuthServices.set(
+    primaryTokenManager: AuthSessionsTokenManagerFactory(authSessionsConfig),
+    identityProviders: [
+      EmailIdentityProviderFactory(emailIDPConfig),
+    ],
+    userProfileConfig: userProfileConfig,
+  );
+
+  pod.authenticationHandler = authServices.authenticationHandler;
 
   // Setup a default page at the web root.
   pod.webServer.addRoute(RootRoute(), '/');
@@ -25,32 +69,6 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
-
-  // After starting the server, you can register future calls. Future calls are
-  // tasks that need to happen in the future, or independently of the request/
-  // response cycle. For example, you can use future calls to send emails, or to
-  // schedule tasks to be executed at a later time. Future calls are executed in
-  // the background. Their schedule is persisted to the database, so you will
-  // not lose them if the server is restarted.
-
-  pod.registerFutureCall(
-    BirthdayReminder(),
-    FutureCallNames.birthdayReminder.name,
-  );
-
-  // You can schedule future calls for a later time during startup. But you can
-  // also schedule them in any endpoint or webroute through the session object.
-  // there is also [futureCallAtTime] if you want to schedule a future call at a
-  // specific time.
-  await pod.futureCallWithDelay(
-    FutureCallNames.birthdayReminder.name,
-    Greeting(
-      message: 'Hello!',
-      author: 'Serverpod Server',
-      timestamp: DateTime.now(),
-    ),
-    Duration(seconds: 5),
-  );
 }
 
 /// Names of all future calls in the server.

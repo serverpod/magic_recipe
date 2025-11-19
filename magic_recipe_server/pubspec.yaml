@@ -9,6 +9,7 @@ environment:
 dependencies:
   serverpod: 3.0.0-rc.1
   dartantic_ai: 1.2.0
+  serverpod_auth_idp_server: ^3.0.0-rc.1
 
 dependency_overrides:
   dartantic_interface: 1.1.0
