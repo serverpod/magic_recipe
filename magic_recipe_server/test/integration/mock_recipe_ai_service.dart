@@ -7,6 +7,7 @@ class MockRecipeAIService extends RecipeAIService {
   final String output;
   final List<String> prompts = [];
   final List<ChatMessage> history = [];
+  final List<DataPart> attachments = [];
 
   @override
   Future<ChatResult<String>> generateContent(
@@ -14,8 +15,36 @@ class MockRecipeAIService extends RecipeAIService {
     List<ChatMessage> history = const [],
     List<Part> attachments = const [],
   }) {
+    return _handleGenerate(prompt, history: history, attachments: attachments);
+  }
+
+  @override
+  Stream<ChatResult<String>> generateContentStream(
+    String prompt, {
+    List<ChatMessage> history = const [],
+    List<DataPart> attachments = const [],
+  }) {
+    return _handleStream(prompt, history: history, attachments: attachments);
+  }
+
+  Future<ChatResult<String>> _handleGenerate(
+    String prompt, {
+    List<ChatMessage> history = const [],
+    List<Part> attachments = const [],
+  }) async {
     prompts.add(prompt);
     this.history.addAll(history);
-    return Future.value(ChatResult<String>(output: output));
+    return ChatResult<String>(output: output);
+  }
+
+  Stream<ChatResult<String>> _handleStream(
+    String prompt, {
+    List<ChatMessage> history = const [],
+    List<DataPart> attachments = const [],
+  }) {
+    prompts.add(prompt);
+    this.history.addAll(history);
+    this.attachments.addAll(attachments);
+    return Stream.value(ChatResult<String>(output: output));
   }
 }

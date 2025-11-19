@@ -94,6 +94,84 @@ void main() {
       expect(recipes[0].text, 'Recipe 2'); // Should be ordered by date descending
       expect(recipes[1].text, 'Recipe 1');
     });
+
+    test('throws on empty filename', () async {
+      final authenticatedSession = sessionBuilder.copyWith(
+        authentication: AuthenticationOverride.authenticationInfo('user-1', {}),
+      );
+
+      await expectLater(
+        () => endpoints.recipes.getUploadDescription(authenticatedSession, ''),
+        throwsA(isA<Exception>()),
+      );
+
+      await expectLater(
+        () =>
+            endpoints.recipes.getUploadDescription(authenticatedSession, '   '),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('throws on unauthenticated getUploadDescription', () async {
+      await expectLater(
+        () =>
+            endpoints.recipes.getUploadDescription(sessionBuilder, 'test.jpg'),
+        throwsA(isA<ServerpodUnauthenticatedException>()),
+      );
+    });
+
+    test('getUploadDescription returns valid upload description and path',
+        () async {
+      final authenticatedSession = sessionBuilder.copyWith(
+        authentication: AuthenticationOverride.authenticationInfo('user-1', {}),
+      );
+
+      final (description, path) = await endpoints.recipes
+          .getUploadDescription(authenticatedSession, 'test.jpg');
+
+      expect(description, isNotNull);
+      expect(path, isNotEmpty);
+      expect(path, contains('uploads/'));
+      expect(path, endsWith('test.jpg'));
+    });
+
+    test('verifyUpload returns false for non-existent path', () async {
+      final authenticatedSession = sessionBuilder.copyWith(
+        authentication: AuthenticationOverride.authenticationInfo('user-1', {}),
+      );
+
+      final result = await endpoints.recipes
+          .verifyUpload(authenticatedSession, 'uploads/non-existent.jpg');
+
+      expect(result, isFalse);
+    });
+
+    test('throws on unauthenticated verifyUpload', () async {
+      await expectLater(
+        () => endpoints.recipes.verifyUpload(sessionBuilder, 'test.jpg'),
+        throwsA(isA<ServerpodUnauthenticatedException>()),
+      );
+    });
+
+    test('getPublicUrlForPath returns valid URL', () async {
+      final authenticatedSession = sessionBuilder.copyWith(
+        authentication: AuthenticationOverride.authenticationInfo('user-1', {}),
+      );
+
+      final path = 'uploads/test-image.jpg';
+      final url = await endpoints.recipes
+          .getPublicUrlForPath(authenticatedSession, path);
+
+      expect(url, isNotEmpty);
+      expect(Uri.tryParse(url), isNotNull);
+    });
+
+    test('throws on unauthenticated getPublicUrlForPath', () async {
+      await expectLater(
+        () => endpoints.recipes.getPublicUrlForPath(sessionBuilder, 'test.jpg'),
+        throwsA(isA<ServerpodUnauthenticatedException>()),
+      );
+    });
   });
 }
 
