@@ -12,6 +12,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../greeting_endpoint.dart' as _i2;
+import '../recipes/endpoints/recipes_endpoint.dart' as _i3;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -21,6 +22,12 @@ class Endpoints extends _i1.EndpointDispatch {
         ..initialize(
           server,
           'greeting',
+          null,
+        ),
+      'recipes': _i3.RecipesEndpoint()
+        ..initialize(
+          server,
+          'recipes',
           null,
         ),
     };
@@ -45,6 +52,31 @@ class Endpoints extends _i1.EndpointDispatch {
                 session,
                 params['name'],
               ),
+        ),
+      },
+    );
+    connectors['recipes'] = _i1.EndpointConnector(
+      name: 'recipes',
+      endpoint: endpoints['recipes']!,
+      methodConnectors: {
+        'generateRecipe': _i1.MethodConnector(
+          name: 'generateRecipe',
+          params: {
+            'ingredients': _i1.ParameterDescription(
+              name: 'ingredients',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['recipes'] as _i3.RecipesEndpoint).generateRecipe(
+                    session,
+                    params['ingredients'],
+                  ),
         ),
       },
     );
