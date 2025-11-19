@@ -13,7 +13,9 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:magic_recipe_client/src/protocol/greeting.dart' as _i3;
-import 'protocol.dart' as _i4;
+import 'package:magic_recipe_client/src/protocol/recipes/models/recipe.dart'
+    as _i4;
+import 'protocol.dart' as _i5;
 
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
@@ -40,8 +42,8 @@ class EndpointRecipes extends _i1.EndpointRef {
   @override
   String get name => 'recipes';
 
-  _i2.Future<String> generateRecipe(String ingredients) =>
-      caller.callServerEndpoint<String>(
+  _i2.Future<_i4.Recipe> generateRecipe(String ingredients) =>
+      caller.callServerEndpoint<_i4.Recipe>(
         'recipes',
         'generateRecipe',
         {'ingredients': ingredients},
@@ -65,7 +67,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i4.Protocol(),
+         _i5.Protocol(),
          securityContext: securityContext,
          authenticationKeyManager: authenticationKeyManager,
          streamingConnectionTimeout: streamingConnectionTimeout,
