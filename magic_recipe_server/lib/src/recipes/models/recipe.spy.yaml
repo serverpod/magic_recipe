@@ -5,4 +5,6 @@ fields:
     text: String
     date: DateTime
     ingredients: String
+    ### If the recipe was deleted, we store the date it was deleted
+    deletedAt: DateTime?, scope=serverOnly
 

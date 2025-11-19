@@ -3,3 +3,4 @@ greeting:
 recipes:
   - generateRecipe:
   - getRecipes:
+  - deleteRecipe:
