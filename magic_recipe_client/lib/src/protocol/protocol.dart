@@ -12,7 +12,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'greeting.dart' as _i2;
+import 'recipes/models/recipe.dart' as _i3;
 export 'greeting.dart';
+export 'recipes/models/recipe.dart';
 export 'client.dart';
 
 class Protocol extends _i1.SerializationManager {
@@ -31,8 +33,14 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i2.Greeting) {
       return _i2.Greeting.fromJson(data) as T;
     }
+    if (t == _i3.Recipe) {
+      return _i3.Recipe.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i2.Greeting?>()) {
       return (data != null ? _i2.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i3.Recipe?>()) {
+      return (data != null ? _i3.Recipe.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -44,6 +52,8 @@ class Protocol extends _i1.SerializationManager {
     switch (data) {
       case _i2.Greeting():
         return 'Greeting';
+      case _i3.Recipe():
+        return 'Recipe';
     }
     return null;
   }
@@ -56,6 +66,9 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_i2.Greeting>(data['data']);
+    }
+    if (dataClassName == 'Recipe') {
+      return deserialize<_i3.Recipe>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
