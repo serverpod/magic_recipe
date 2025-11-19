@@ -24,6 +24,23 @@ class RecipesEndpoint extends Endpoint {
     return RecipeAIService.fromApiKey(apiKey);
   }
 
+  Stream<Recipe> generateRecipeStream(
+    Session session,
+    String ingredients, [
+    String? imagePath,
+  ]) async* {
+    _validateIngredients(ingredients);
+    final aiService = _getAIService(session);
+    final userId = _getUserId(session);
+
+    yield* aiService.generateRecipeStream(
+      session,
+      userId,
+      ingredients,
+      imagePath,
+    );
+  }
+
   Future<Recipe> generateRecipe(
     Session session,
     String ingredients, [
@@ -31,7 +48,8 @@ class RecipesEndpoint extends Endpoint {
   ]) async {
     final aiService = _getAIService(session);
     final userId = _getUserId(session);
-    return await aiService.generateRecipe(session, userId, ingredients, imagePath);
+    return await aiService.generateRecipe(
+        session, userId, ingredients, imagePath);
   }
 
   Future<List<Recipe>> getRecipes(Session session) async {
@@ -109,5 +127,11 @@ class RecipesEndpoint extends Endpoint {
   String _generateUploadPath(String filename) {
     final uniqueId = _uuid.v4();
     return 'uploads/$uniqueId/$filename';
+  }
+
+  void _validateIngredients(String ingredients) {
+    if (ingredients.trim().isEmpty) {
+      throw RecipeException('Ingredients cannot be empty');
+    }
   }
 }

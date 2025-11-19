@@ -21,6 +21,52 @@ abstract class RecipeAIService {
   static const _recipeInstructions = '''
 Always put the title of the recipe in the first line, and then the instructions. The recipe should be easy to follow and include all necessary steps. Please provide a detailed recipe. Only put the title in the first line, no markup.''';
 
+  /// Generates a recipe stream using the provided ingredients and optional image.
+  ///
+  /// Handles caching, generation, and persistence automatically.
+  /// [userId] is required to associate the recipe with the user.
+  /// [ingredients] must not be empty.
+  /// [imagePath] is optional and should be a valid path to an uploaded image.
+  Stream<Recipe> generateRecipeStream(
+    Session session,
+    String userId,
+    String ingredients,
+    String? imagePath,
+  ) async* {
+    _validateIngredients(ingredients);
+
+    final cacheKey = generateCacheKey(ingredients, imagePath);
+
+    // Check cache first
+    final cached = await _getCachedRecipe(session, cacheKey, userId);
+    if (cached != null) {
+      yield cached;
+      return;
+    }
+
+    // Generate recipe
+    final (history, attachments) = await _buildPrompt(
+      session,
+      ingredients,
+      imagePath,
+    );
+
+    var recipe = _createEmptyRecipe(ingredients, imagePath);
+
+    await for (final chunk in generateContentStream(
+      '',
+      history: history,
+      attachments: attachments,
+    )) {
+      recipe = recipe.copyWith(text: recipe.text + chunk.output);
+      yield recipe;
+    }
+
+    // Save and yield final recipe
+    final saved = await _saveRecipe(session, recipe, userId, cacheKey);
+    yield saved;
+  }
+
   /// Generates a recipe using the provided ingredients and optional image.
   ///
   /// Handles caching, generation, and persistence automatically.
@@ -171,6 +217,13 @@ Always put the title of the recipe in the first line, and then the instructions.
     List<ChatMessage> history = const [],
     List<Part> attachments = const [],
   });
+
+  /// Generates content stream using the AI service.
+  Stream<ChatResult<String>> generateContentStream(
+    String prompt, {
+    List<ChatMessage> history = const [],
+    List<DataPart> attachments = const [],
+  });
 }
 
 /// Production implementation using Gemini AI.
@@ -197,6 +250,19 @@ class ProductionRecipeAIService extends RecipeAIService {
     List<Part> attachments = const [],
   }) {
     return _agent.send(
+      prompt,
+      history: history,
+      attachments: attachments,
+    );
+  }
+
+  @override
+  Stream<ChatResult<String>> generateContentStream(
+    String prompt, {
+    List<ChatMessage> history = const [],
+    List<DataPart> attachments = const [],
+  }) {
+    return _agent.sendStream(
       prompt,
       history: history,
       attachments: attachments,
