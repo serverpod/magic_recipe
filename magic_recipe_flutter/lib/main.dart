@@ -4,6 +4,8 @@ import 'package:magic_recipe_flutter/pages/pages.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 
+typedef AdminUser = (AuthUserModel, UserProfileModel);
+
 /// Sets up a global client object that can be used to talk to the server from
 /// anywhere in our app. The client is generated from your server code
 /// and is set up to connect to a Serverpod running on a local server on
@@ -105,6 +107,11 @@ class MyHomePageState extends State<MyHomePage> {
 
   bool _loading = false;
 
+  bool get _isAdmin {
+    final scopeNames = client.auth.authInfo.value?.scopeNames ?? {};
+    return scopeNames.contains('serverpod.admin');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -146,11 +153,39 @@ class MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _handleLogout() async {
+    await client.auth.signOutDevice();
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          if (_isAdmin)
+            IconButton(
+              icon: const Icon(Icons.admin_panel_settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminDashboardPage(),
+                  ),
+                );
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _handleLogout,
+          ),
+        ],
       ),
       body: Row(
         children: [
