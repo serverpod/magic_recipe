@@ -95,8 +95,15 @@ void run(List<String> args) async {
 
   // Register future calls
   pod.registerFutureCall(
-    RemoveDeletedRecipesFutureCall(),
+    ReschedulingRemoveDeletedRecipesFutureCall(),
     FutureCallNames.rescheduleRemoveDeletedRecipes.name,
+  );
+
+  // Schedule the initial cleanup task
+  await pod.futureCallWithDelay(
+    FutureCallNames.rescheduleRemoveDeletedRecipes.name,
+    null,
+    Duration(seconds: 5),
   );
 }
 
