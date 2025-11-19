@@ -6,6 +6,11 @@ emailIDP:
   - startPasswordReset:
   - verifyPasswordResetCode:
   - finishPasswordReset:
+authAdmin:
+  - listUsers:
+  - listAuthUsers:
+  - blockUser:
+  - unblockUser:
 greeting:
   - hello:
 recipes:
