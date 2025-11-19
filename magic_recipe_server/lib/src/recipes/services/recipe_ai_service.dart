@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:dartantic_ai/dartantic_ai.dart';
 import 'package:dartantic_interface/dartantic_interface.dart';
 import 'package:serverpod/serverpod.dart';
@@ -20,53 +21,102 @@ abstract class RecipeAIService {
   static const _recipeInstructions = '''
 Always put the title of the recipe in the first line, and then the instructions. The recipe should be easy to follow and include all necessary steps. Please provide a detailed recipe. Only put the title in the first line, no markup.''';
 
-  /// Generates a recipe using the provided ingredients.
+  /// Generates a recipe using the provided ingredients and optional image.
   ///
   /// Handles caching, generation, and persistence automatically.
   /// [userId] is required to associate the recipe with the user.
   /// [ingredients] must not be empty.
+  /// [imagePath] is optional and should be a valid path to an uploaded image.
   Future<Recipe> generateRecipe(
     Session session,
     String userId,
     String ingredients,
+    String? imagePath,
   ) async {
     _validateIngredients(ingredients);
 
-    final cacheKey = generateCacheKey(ingredients);
+    final cacheKey = generateCacheKey(ingredients, imagePath);
 
     // Check cache first
     final cached = await _getCachedRecipe(session, cacheKey, userId);
     if (cached != null) return cached;
 
     // Generate recipe
-    final history = <ChatMessage>[
-      ChatMessage.user(_buildTextPrompt(ingredients))
-    ];
+    final (history, attachments) = await _buildPrompt(
+      session,
+      ingredients,
+      imagePath,
+    );
 
     final response = await generateContent(
       '',
       history: history,
-      attachments: [],
+      attachments: attachments,
     );
 
     if (response.output.isEmpty) {
       throw RecipeException('Empty response from AI service');
     }
 
-    final recipe = Recipe(
-      author: 'Gemini',
-      text: response.output,
-      date: DateTime.now(),
-      ingredients: ingredients,
-    );
+    final recipe = _createEmptyRecipe(ingredients, imagePath)
+        .copyWith(text: response.output);
 
     // Save and return
     return await _saveRecipe(session, recipe, userId, cacheKey);
   }
 
+  static const _storageId = 'public';
+
+  Future<(List<ChatMessage>, List<DataPart>)> _buildPrompt(
+    Session session,
+    String ingredients,
+    String? imagePath,
+  ) async {
+    final history = <ChatMessage>[];
+    final attachments = <DataPart>[];
+
+    if (imagePath != null) {
+      final imageData = await _loadImage(session, imagePath);
+      attachments.add(DataPart(imageData, mimeType: 'image/jpeg'));
+      history.add(ChatMessage.system(
+        'Generate a recipe using the detected ingredients. $_recipeInstructions',
+      ));
+      history.add(ChatMessage.user(
+        'These are the detected ingredients: $ingredients.',
+      ));
+    } else {
+      history.add(ChatMessage.user(_buildTextPrompt(ingredients)));
+    }
+
+    return (history, attachments);
+  }
+
+  Future<Uint8List> _loadImage(Session session, String path) async {
+    final imageData = await session.storage.retrieveFile(
+      storageId: _storageId,
+      path: path,
+    );
+
+    if (imageData == null) {
+      throw RecipeException('Image not found: $path');
+    }
+
+    return imageData.buffer.asUint8List();
+  }
+
   String _buildTextPrompt(String ingredients) {
     return 'Generate a recipe using the following ingredients: $ingredients. '
         '$_recipeInstructions';
+  }
+
+  Recipe _createEmptyRecipe(String ingredients, String? imagePath) {
+    return Recipe(
+      author: 'Gemini',
+      text: '',
+      date: DateTime.now(),
+      ingredients: ingredients,
+      imagePath: imagePath,
+    );
   }
 
   void _validateIngredients(String ingredients) {
@@ -75,9 +125,9 @@ Always put the title of the recipe in the first line, and then the instructions.
     }
   }
 
-  /// Generates a cache key for the given ingredients.
-  String generateCacheKey(String ingredients) {
-    return 'recipe-$ingredients';
+  /// Generates a cache key for the given ingredients and image path.
+  String generateCacheKey(String ingredients, String? imagePath) {
+    return 'recipe-$ingredients-${imagePath ?? ''}';
   }
 
   /// Gets a cached recipe if available, otherwise returns null.

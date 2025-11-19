@@ -8,6 +8,9 @@ class RecipesEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
+  static const _storageId = 'public';
+  static const _uuid = Uuid();
+
   final RecipeAIService? _aiService;
 
   RecipeAIService _getAIService(Session session) {
@@ -21,10 +24,14 @@ class RecipesEndpoint extends Endpoint {
     return RecipeAIService.fromApiKey(apiKey);
   }
 
-  Future<Recipe> generateRecipe(Session session, String ingredients) async {
+  Future<Recipe> generateRecipe(
+    Session session,
+    String ingredients, [
+    String? imagePath,
+  ]) async {
     final aiService = _getAIService(session);
     final userId = _getUserId(session);
-    return await aiService.generateRecipe(session, userId, ingredients);
+    return await aiService.generateRecipe(session, userId, ingredients, imagePath);
   }
 
   Future<List<Recipe>> getRecipes(Session session) async {
@@ -57,6 +64,39 @@ class RecipesEndpoint extends Endpoint {
     );
   }
 
+  Future<(String?, String)> getUploadDescription(
+    Session session,
+    String filename,
+  ) async {
+    if (filename.trim().isEmpty) {
+      throw RecipeException('Filename cannot be empty');
+    }
+
+    final path = _generateUploadPath(filename);
+    final description = await session.storage.createDirectFileUploadDescription(
+      storageId: _storageId,
+      path: path,
+    );
+
+    return (description, path);
+  }
+
+  Future<bool> verifyUpload(Session session, String path) async {
+    return session.storage.verifyDirectFileUpload(
+      storageId: _storageId,
+      path: path,
+    );
+  }
+
+  Future<String> getPublicUrlForPath(Session session, String path) async {
+    final url = await session.storage.getPublicUrl(
+      storageId: _storageId,
+      path: path,
+    );
+
+    return url.toString();
+  }
+
   /// Private helpers
   String _getUserId(Session session) {
     final userId = session.authenticated?.userIdentifier;
@@ -64,5 +104,10 @@ class RecipesEndpoint extends Endpoint {
       throw RecipeException('User not authenticated');
     }
     return userId;
+  }
+
+  String _generateUploadPath(String filename) {
+    final uniqueId = _uuid.v4();
+    return 'uploads/$uniqueId/$filename';
   }
 }
