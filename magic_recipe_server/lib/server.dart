@@ -8,6 +8,7 @@ import 'package:serverpod_auth_idp_server/providers/email.dart';
 
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
+import 'src/recipes/recipes.dart';
 
 // This is the starting point of your Serverpod server. In most cases, you will
 // only need to make additions to this file if you add future calls,  are
@@ -91,10 +92,18 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+
+  // Register future calls
+  pod.registerFutureCall(
+    RemoveDeletedRecipesFutureCall(),
+    FutureCallNames.rescheduleRemoveDeletedRecipes.name,
+  );
 }
 
 /// Names of all future calls in the server.
 ///
 /// This is better than using a string literal, as it will reduce the risk of
 /// typos and make it easier to refactor the code.
-enum FutureCallNames { birthdayReminder }
+enum FutureCallNames {
+  rescheduleRemoveDeletedRecipes,
+}
