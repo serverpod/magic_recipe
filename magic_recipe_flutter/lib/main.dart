@@ -136,14 +136,19 @@ class MyHomePageState extends State<MyHomePage> {
         _recipe = null;
         _loading = true;
       });
-      final result = await client.recipes.generateRecipe(
+      await for (final recipe in client.recipes.generateRecipeStream(
         _textEditingController.text,
         _imagePath,
-      );
+      )) {
+        setState(() {
+          _recipe = recipe;
+        });
+      }
       setState(() {
         _errorMessage = null;
-        _recipe = result;
-        _recipeHistory.insert(0, result);
+        if (_recipe != null) {
+          _recipeHistory.insert(0, _recipe!);
+        }
         _loading = false;
       });
       await _loadRecipeHistory();
