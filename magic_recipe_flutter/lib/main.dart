@@ -1,19 +1,14 @@
 import 'package:magic_recipe_client/magic_recipe_client.dart';
 import 'package:flutter/material.dart';
-import 'package:magic_recipe_flutter/pages/pages.dart';
-import 'package:magic_recipe_flutter/widgets/image_widgets.dart';
-import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
-
-typedef AdminUser = (AuthUserModel, UserProfileModel);
 
 /// Sets up a global client object that can be used to talk to the server from
 /// anywhere in our app. The client is generated from your server code
 /// and is set up to connect to a Serverpod running on a local server on
 /// the default port. You will need to modify this to connect to staging or
 /// production servers.
-/// In a larger app, you may want to use the dependency injection of your choice instead of
-/// using a global client object. This is just a simple example.
+/// In a larger app, you may want to use the dependency injection of your choice
+/// instead of using a global client object. This is just a simple example.
 late final Client client;
 
 late String serverUrl;
@@ -30,56 +25,20 @@ void main() {
       : serverUrlFromEnv;
 
   client = Client(serverUrl)
-    ..connectivityMonitor = FlutterConnectivityMonitor()
-    ..authSessionManager = ClientAuthSessionManager();
+    ..connectivityMonitor = FlutterConnectivityMonitor();
 
-  // Loads the authenticated state from flutter secure storage.
-  client.auth.initialize();
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool _isSignedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // NOTE: This is the only required setState to ensure that the  UI gets
-    // updated when the auth state changes.
-    client.auth.authInfo.addListener(_updateSignedInState);
-  }
-
-  @override
-  void dispose() {
-    client.auth.authInfo.removeListener(_updateSignedInState);
-    super.dispose();
-  }
-
-  void _updateSignedInState() {
-    setState(() {
-      _isSignedIn = client.auth.isAuthenticated;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Serverpod Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: _isSignedIn
-          ? const MyHomePage(title: 'Serverpod Example')
-          : const LoginPage(),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const MyHomePage(title: 'Serverpod Example'),
     );
   }
 }
@@ -95,199 +54,71 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   /// Holds the last result or null if no result exists yet.
-  Recipe? _recipe;
+  String? _resultMessage;
 
-  /// Holds the recipe history
-  List<Recipe> _recipeHistory = [];
-
-  /// Holds the last error message that we've received from the server or null if no
-  /// error exists yet.
+  /// Holds the last error message that we've received from the server or null
+  /// if no error exists yet.
   String? _errorMessage;
 
   final _textEditingController = TextEditingController();
-  String? _imagePath;
 
-  bool _loading = false;
-
-  bool get _isAdmin {
-    final scopeNames = client.auth.authInfo.value?.scopeNames ?? {};
-    return scopeNames.contains('serverpod.admin');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadRecipeHistory();
-  }
-
-  Future<void> _loadRecipeHistory() async {
+  /// Calls the `hello` method of the `greeting` endpoint. Will set either the
+  /// `_resultMessage` or `_errorMessage` field, depending on if the call
+  /// is successful.
+  void _callHello() async {
     try {
-      final recipes = await client.recipes.getRecipes();
-      setState(() => _recipeHistory = recipes);
-    } catch (e) {
-      setState(() => _errorMessage = 'Failed to load recipes: $e');
-    }
-  }
-
-  void _callGenerateRecipe() async {
-    try {
+      final result = await client.greeting.hello(_textEditingController.text);
       setState(() {
         _errorMessage = null;
-        _recipe = null;
-        _loading = true;
+        _resultMessage = result.message;
       });
-      await for (final recipe in client.recipes.generateRecipeStream(
-        _textEditingController.text,
-        _imagePath,
-      )) {
-        setState(() {
-          _recipe = recipe;
-        });
-      }
-      setState(() {
-        _errorMessage = null;
-        if (_recipe != null) {
-          _recipeHistory.insert(0, _recipe!);
-        }
-        _loading = false;
-      });
-      await _loadRecipeHistory();
     } catch (e) {
       setState(() {
         _errorMessage = '$e';
-        _recipe = null;
-        _loading = false;
       });
-    }
-  }
-
-  void _handleLogout() async {
-    await client.auth.signOutDevice();
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          if (_isAdmin)
-            IconButton(
-              icon: const Icon(Icons.admin_panel_settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AdminDashboardPage(),
-                  ),
-                );
-              },
-            ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _handleLogout,
-          ),
-        ],
-      ),
-      body: Row(
-        children: [
-          Expanded(
-            child: DecoratedBox(
-              decoration: BoxDecoration(color: Colors.grey[300]),
-              child: ListView.builder(
-                itemCount: _recipeHistory.length,
-                itemBuilder: (context, index) {
-                  final recipe = _recipeHistory[index];
-                  final firstLineEnd = recipe.text.indexOf('\n');
-                  final title = firstLineEnd != -1
-                      ? recipe.text.substring(0, firstLineEnd)
-                      : recipe.text;
-                  return ListTile(
-                    title: Text(title),
-                    subtitle: Text('${recipe.author} - ${recipe.date}'),
-                    onTap: () {
-                      setState(() {
-                        _recipe = recipe;
-                        _textEditingController.text = recipe.ingredients;
-                      });
-                    },
-                  );
-                },
+      appBar: AppBar(title: Text(widget.title)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: TextField(
+                controller: _textEditingController,
+                decoration: const InputDecoration(hintText: 'Enter your name'),
               ),
             ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: TextField(
-                      controller: _textEditingController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your ingredients',
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: ImageUploadButton(
-                      imagePath: _imagePath,
-                      onImagePathChanged: (path) {
-                        setState(() {
-                          _imagePath = path;
-                        });
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: ElevatedButton(
-                      onPressed: _loading ? null : _callGenerateRecipe,
-                      child: _loading
-                          ? const Text('Loading...')
-                          : const Text('Generate Recipe'),
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: ResultDisplay(
-                        resultMessage: _recipe != null
-                            ? '${_recipe?.author} on ${_recipe?.date}:\n${_recipe?.text}'
-                            : null,
-                        errorMessage: _errorMessage,
-                      ),
-                    ),
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: ElevatedButton(
+                onPressed: _callHello,
+                child: const Text('Send to Server'),
               ),
             ),
-          ),
-        ],
+            ResultDisplay(
+              resultMessage: _resultMessage,
+              errorMessage: _errorMessage,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// ResultDisplays shows the result of the call. Either the returned result from
-/// the `example.greeting` endpoint method or an error message.
+/// ResultDisplays shows the result of the call. Either the returned result
+/// from the `example.greeting` endpoint method or an error message.
 class ResultDisplay extends StatelessWidget {
   final String? resultMessage;
   final String? errorMessage;
 
-  const ResultDisplay({
-    super.key,
-    this.resultMessage,
-    this.errorMessage,
-  });
+  const ResultDisplay({super.key, this.resultMessage, this.errorMessage});
 
   @override
   Widget build(BuildContext context) {
@@ -308,9 +139,7 @@ class ResultDisplay extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 50),
       child: Container(
         color: backgroundColor,
-        child: Center(
-          child: Text(text),
-        ),
+        child: Center(child: Text(text)),
       ),
     );
   }

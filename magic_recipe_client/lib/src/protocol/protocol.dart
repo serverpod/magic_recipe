@@ -81,6 +81,15 @@ class Protocol extends _i1.SerializationManager {
       return (data as List).map((e) => deserialize<_i5.Recipe>(e)).toList()
           as T;
     }
+    if (t == _i1.getType<(String?, String)>()) {
+      return (
+            ((data as Map)['p'] as List)[0] == null
+                ? null
+                : deserialize<String>(data['p'][0]),
+            deserialize<String>(data['p'][1]),
+          )
+          as T;
+    }
     try {
       return _i6.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
@@ -145,6 +154,14 @@ Map<String, dynamic>? mapRecordToJson(Record? record) {
     return null;
   }
   if (record is (_i4.AuthUserModel, _i4.UserProfileModel)) {
+    return {
+      "p": [
+        record.$1,
+        record.$2,
+      ],
+    };
+  }
+  if (record is (String?, String)) {
     return {
       "p": [
         record.$1,
