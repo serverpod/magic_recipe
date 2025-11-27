@@ -7,8 +7,8 @@ import 'package:serverpod_flutter/serverpod_flutter.dart';
 /// and is set up to connect to a Serverpod running on a local server on
 /// the default port. You will need to modify this to connect to staging or
 /// production servers.
-/// In a larger app, you may want to use the dependency injection of your choice
-/// instead of using a global client object. This is just a simple example.
+/// In a larger app, you may want to use the dependency injection of your choice instead of
+/// using a global client object. This is just a simple example.
 late final Client client;
 
 late String serverUrl;
@@ -20,9 +20,8 @@ void main() {
   // You can set the variable when running or building your app like this:
   // E.g. `flutter run --dart-define=SERVER_URL=https://api.example.com/`
   const serverUrlFromEnv = String.fromEnvironment('SERVER_URL');
-  final serverUrl = serverUrlFromEnv.isEmpty
-      ? 'http://$localhost:8080/'
-      : serverUrlFromEnv;
+  final serverUrl =
+      serverUrlFromEnv.isEmpty ? 'http://$localhost:8080/' : serverUrlFromEnv;
 
   client = Client(serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor();
@@ -37,7 +36,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Serverpod Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
       home: const MyHomePage(title: 'Serverpod Example'),
     );
   }
@@ -56,25 +57,33 @@ class MyHomePageState extends State<MyHomePage> {
   /// Holds the last result or null if no result exists yet.
   String? _resultMessage;
 
-  /// Holds the last error message that we've received from the server or null
-  /// if no error exists yet.
+  /// Holds the last error message that we've received from the server or null if no
+  /// error exists yet.
   String? _errorMessage;
 
   final _textEditingController = TextEditingController();
 
-  /// Calls the `hello` method of the `greeting` endpoint. Will set either the
-  /// `_resultMessage` or `_errorMessage` field, depending on if the call
-  /// is successful.
-  void _callHello() async {
+  bool _loading = false;
+
+  void _callGenerateRecipe() async {
     try {
-      final result = await client.greeting.hello(_textEditingController.text);
       setState(() {
         _errorMessage = null;
-        _resultMessage = result.message;
+        _resultMessage = null;
+        _loading = true;
+      });
+      final result =
+          await client.recipes.generateRecipe(_textEditingController.text);
+      setState(() {
+        _errorMessage = null;
+        _resultMessage = result;
+        _loading = false;
       });
     } catch (e) {
       setState(() {
         _errorMessage = '$e';
+        _resultMessage = null;
+        _loading = false;
       });
     }
   }
@@ -82,7 +91,9 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -91,19 +102,27 @@ class MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: TextField(
                 controller: _textEditingController,
-                decoration: const InputDecoration(hintText: 'Enter your name'),
+                decoration: const InputDecoration(
+                  hintText: 'Enter your name',
+                ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: ElevatedButton(
-                onPressed: _callHello,
-                child: const Text('Send to Server'),
+                onPressed: _loading ? null : _callGenerateRecipe,
+                child: _loading
+                    ? const Text('Loading...')
+                    : const Text('Send to Server'),
               ),
             ),
-            ResultDisplay(
-              resultMessage: _resultMessage,
-              errorMessage: _errorMessage,
+            Expanded(
+              child: SingleChildScrollView(
+                child: ResultDisplay(
+                  resultMessage: _resultMessage,
+                  errorMessage: _errorMessage,
+                ),
+              ),
             ),
           ],
         ),
@@ -112,13 +131,17 @@ class MyHomePageState extends State<MyHomePage> {
   }
 }
 
-/// ResultDisplays shows the result of the call. Either the returned result
-/// from the `example.greeting` endpoint method or an error message.
+/// ResultDisplays shows the result of the call. Either the returned result from
+/// the `example.greeting` endpoint method or an error message.
 class ResultDisplay extends StatelessWidget {
   final String? resultMessage;
   final String? errorMessage;
 
-  const ResultDisplay({super.key, this.resultMessage, this.errorMessage});
+  const ResultDisplay({
+    super.key,
+    this.resultMessage,
+    this.errorMessage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +162,9 @@ class ResultDisplay extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 50),
       child: Container(
         color: backgroundColor,
-        child: Center(child: Text(text)),
+        child: Center(
+          child: Text(text),
+        ),
       ),
     );
   }
