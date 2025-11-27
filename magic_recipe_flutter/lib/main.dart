@@ -1,6 +1,7 @@
 import 'package:magic_recipe_client/magic_recipe_client.dart';
 import 'package:flutter/material.dart';
 import 'package:magic_recipe_flutter/pages/pages.dart';
+import 'package:magic_recipe_flutter/widgets/image_widgets.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 
@@ -104,6 +105,7 @@ class MyHomePageState extends State<MyHomePage> {
   String? _errorMessage;
 
   final _textEditingController = TextEditingController();
+  String? _imagePath;
 
   bool _loading = false;
 
@@ -136,6 +138,7 @@ class MyHomePageState extends State<MyHomePage> {
       });
       final result = await client.recipes.generateRecipe(
         _textEditingController.text,
+        _imagePath,
       );
       setState(() {
         _errorMessage = null;
@@ -227,6 +230,17 @@ class MyHomePageState extends State<MyHomePage> {
                       decoration: const InputDecoration(
                         hintText: 'Enter your ingredients',
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: ImageUploadButton(
+                      imagePath: _imagePath,
+                      onImagePathChanged: (path) {
+                        setState(() {
+                          _imagePath = path;
+                        });
+                      },
                     ),
                   ),
                   Padding(
