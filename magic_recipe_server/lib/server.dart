@@ -48,7 +48,29 @@ void run(List<String> args) async {
     },
   );
 
-  final userProfileConfig = UserProfileConfig();
+  final userProfileConfig = UserProfileConfig(
+    onAfterUserProfileCreated: (
+      Session session,
+      UserProfileModel userProfile, {
+      required transaction,
+    }) async {
+      final email = userProfile.email;
+      if (email == null) return;
+      if (!email.endsWith('serverpod.dev')) return;
+      // Add admin scope to the user
+      await AuthServices.instance.authUsers.update(
+        session,
+        authUserId: userProfile.authUserId,
+        scopes: {Scope.admin},
+        transaction: transaction,
+      );
+
+      session.log(
+        'User ${userProfile.email} created with admin scope',
+        level: LogLevel.info,
+      );
+    },
+  );
 
   final authServices = AuthServices.set(
     primaryTokenManager: AuthSessionsTokenManagerFactory(authSessionsConfig),
