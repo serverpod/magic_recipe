@@ -22,4 +22,12 @@ class RecipesEndpoint extends Endpoint {
     final aiService = _getAIService(session);
     return await aiService.generateRecipe(session, ingredients);
   }
+
+  Future<List<Recipe>> getRecipes(Session session) async {
+    return Recipe.db.find(
+      session,
+      orderBy: (t) => t.date,
+      orderDescending: true,
+    );
+  }
 }
