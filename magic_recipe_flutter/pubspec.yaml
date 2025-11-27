@@ -25,6 +25,7 @@ dependencies:
   flutter:
     sdk: flutter
   serverpod_flutter: 3.0.0-rc.2
+  serverpod_auth_idp_flutter: ^3.0.0-rc.2
   magic_recipe_client:
     path: ../magic_recipe_client
 
