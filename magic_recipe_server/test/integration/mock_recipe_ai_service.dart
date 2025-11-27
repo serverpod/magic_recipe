@@ -19,4 +19,3 @@ class MockRecipeAIService extends RecipeAIService {
     return Future.value(ChatResult<String>(output: output));
   }
 }
-
