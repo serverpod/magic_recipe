@@ -26,8 +26,22 @@ class RecipesEndpoint extends Endpoint {
   Future<List<Recipe>> getRecipes(Session session) async {
     return Recipe.db.find(
       session,
+      where: (t) => t.deletedAt.equals(null),
       orderBy: (t) => t.date,
       orderDescending: true,
+    );
+  }
+
+  Future<void> deleteRecipe(Session session, int recipeId) async {
+    final recipe = await Recipe.db.findById(session, recipeId);
+
+    if (recipe == null) {
+      throw RecipeException('Recipe not found');
+    }
+
+    await Recipe.db.updateRow(
+      session,
+      recipe.copyWith(deletedAt: DateTime.now()),
     );
   }
 }
