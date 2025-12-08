@@ -15,6 +15,7 @@ abstract class RecipeAIService {
     return ProductionRecipeAIService(apiKey: apiKey);
   }
 
+  static const _cacheLifetime = Duration(days: 1);
   static const _recipeInstructions = '''
 Always put the title of the recipe in the first line, and then the instructions. The recipe should be easy to follow and include all necessary steps. Please provide a detailed recipe. Only put the title in the first line, no markup.''';
 
@@ -28,6 +29,12 @@ Always put the title of the recipe in the first line, and then the instructions.
     String ingredients,
   ) async {
     _validateIngredients(ingredients);
+
+    final cacheKey = generateCacheKey(ingredients);
+
+    // Get the cached recipe if it exists.
+    final cached = await _getCachedRecipe(session, cacheKey, userId);
+    if (cached != null) return cached;
 
     final response = await generateContent(
       _buildTextPrompt(ingredients),
@@ -46,8 +53,7 @@ Always put the title of the recipe in the first line, and then the instructions.
       userId: userId,
     );
 
-    final recipeWithId = await Recipe.db.insertRow(session, recipe);
-    return recipeWithId;
+    return await _saveRecipe(session, recipe, userId, cacheKey);
   }
 
   String _buildTextPrompt(String ingredients) {
@@ -66,6 +72,46 @@ Always put the title of the recipe in the first line, and then the instructions.
     String prompt, {
     List<Part> attachments = const [],
   });
+
+  /// Generates a cache key for the given ingredients.
+  String generateCacheKey(String ingredients) {
+    return 'recipe-$ingredients';
+  }
+
+  /// Gets a cached recipe if available, otherwise returns null.
+  Future<Recipe?> _getCachedRecipe(
+    Session session,
+    String cacheKey,
+    String userId,
+  ) async {
+    final cached = await session.caches.local.get<Recipe>(cacheKey);
+    if (cached == null) return null;
+
+    session.log('Cache hit for key: $cacheKey');
+    return await Recipe.db.insertRow(
+      session,
+      cached.copyWith(userId: userId),
+    );
+  }
+
+  /// Saves a recipe to cache and database.
+  Future<Recipe> _saveRecipe(
+    Session session,
+    Recipe recipe,
+    String userId,
+    String cacheKey,
+  ) async {
+    await session.caches.local.put(
+      cacheKey,
+      recipe,
+      lifetime: _cacheLifetime,
+    );
+
+    return await Recipe.db.insertRow(
+      session,
+      recipe.copyWith(userId: userId),
+    );
+  }
 }
 
 /// Production implementation using Gemini AI.
