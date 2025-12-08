@@ -17,16 +17,16 @@ class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'recipe': _i2.RecipeEndpoint()
+      'recipes': _i2.RecipesEndpoint()
         ..initialize(
           server,
-          'recipe',
+          'recipes',
           null,
         ),
     };
-    connectors['recipe'] = _i1.EndpointConnector(
-      name: 'recipe',
-      endpoint: endpoints['recipe']!,
+    connectors['recipes'] = _i1.EndpointConnector(
+      name: 'recipes',
+      endpoint: endpoints['recipes']!,
       methodConnectors: {
         'generateRecipe': _i1.MethodConnector(
           name: 'generateRecipe',
@@ -42,7 +42,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['recipe'] as _i2.RecipeEndpoint).generateRecipe(
+                  (endpoints['recipes'] as _i2.RecipesEndpoint).generateRecipe(
                     session,
                     params['ingredients'],
                   ),

@@ -12,22 +12,26 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
-import 'protocol.dart' as _i3;
+import 'package:magic_recipe_client/src/protocol/recipes/models/recipe.dart'
+    as _i3;
+import 'protocol.dart' as _i4;
 
 /// This is the endpoint that will be used to generate a recipe using the
 /// Google Gemini API. It extends the Endpoint class and implements the
 /// generateRecipe method.
+/// Endpoint for AI-powered recipe generation using Gemini.
+/// Uses dependency-injected RecipeAIService, or falls back to API key from passwords.
 /// {@category Endpoint}
-class EndpointRecipe extends _i1.EndpointRef {
-  EndpointRecipe(_i1.EndpointCaller caller) : super(caller);
+class EndpointRecipes extends _i1.EndpointRef {
+  EndpointRecipes(_i1.EndpointCaller caller) : super(caller);
 
   @override
-  String get name => 'recipe';
+  String get name => 'recipes';
 
-  /// Pass in a string containing the ingredients and get a recipe back.
-  _i2.Future<String> generateRecipe(String ingredients) =>
-      caller.callServerEndpoint<String>(
-        'recipe',
+  /// Accepts a string containing ingredients and returns a generated Recipe.
+  _i2.Future<_i3.Recipe> generateRecipe(String ingredients) =>
+      caller.callServerEndpoint<_i3.Recipe>(
+        'recipes',
         'generateRecipe',
         {'ingredients': ingredients},
       );
@@ -50,7 +54,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i3.Protocol(),
+         _i4.Protocol(),
          securityContext: securityContext,
          authenticationKeyManager: authenticationKeyManager,
          streamingConnectionTimeout: streamingConnectionTimeout,
@@ -60,13 +64,13 @@ class Client extends _i1.ServerpodClientShared {
          disconnectStreamsOnLostInternetConnection:
              disconnectStreamsOnLostInternetConnection,
        ) {
-    recipe = EndpointRecipe(this);
+    recipes = EndpointRecipes(this);
   }
 
-  late final EndpointRecipe recipe;
+  late final EndpointRecipes recipes;
 
   @override
-  Map<String, _i1.EndpointRef> get endpointRefLookup => {'recipe': recipe};
+  Map<String, _i1.EndpointRef> get endpointRefLookup => {'recipes': recipes};
 
   @override
   Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};
