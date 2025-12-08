@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:magic_recipe_server/src/recipes/recipes.dart';
 import 'package:serverpod/serverpod.dart';
 
 import 'package:magic_recipe_server/src/web/routes/root.dart';
@@ -72,6 +73,11 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+
+  pod.registerFutureCall(
+    ReschedulingRemoveDeletedRecipesFutureCall(),
+    FutureCallNames.rescheduleRemoveDeletedRecipes.name,
+  );
 }
 
 void _sendRegistrationCode(
