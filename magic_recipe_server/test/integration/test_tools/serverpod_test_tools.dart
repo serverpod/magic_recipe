@@ -8,7 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
-
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
@@ -20,6 +19,11 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
 import 'package:magic_recipe_server/src/generated/protocol.dart' as _i5;
 import 'package:magic_recipe_server/src/generated/recipes/models/recipe.dart'
     as _i6;
+import 'package:magic_recipe_server/src/generated/future_calls_generated_models/recipes_future_call_remove_deleted_recipes_model.dart'
+    as _i7;
+import 'package:magic_recipe_server/src/generated/future_calls.dart' as _i8;
+import 'package:magic_recipe_server/src/generated/future_calls_generated_models/recipes_future_call_reschedule_remove_deleted_recipes_model.dart'
+    as _i9;
 import 'package:magic_recipe_server/src/generated/protocol.dart';
 import 'package:magic_recipe_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -127,9 +131,13 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _EmailIDPEndpoint emailIDP;
 
   late final _AdminEndpoint admin;
+
+  late final _RecipesAdminEndpoint recipesAdmin;
 
   late final _RecipesEndpoint recipes;
 }
@@ -149,11 +157,19 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
+    recipesAdmin = _RecipesAdminEndpoint(
+      endpoints,
+      serializationManager,
+    );
     recipes = _RecipesEndpoint(
       endpoints,
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final recipes = _RecipesFutureCall();
 }
 
 class _EmailIDPEndpoint {
@@ -576,6 +592,110 @@ class _AdminEndpoint {
   }
 }
 
+class _RecipesAdminEndpoint {
+  _RecipesAdminEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<void> triggerDeletedRecipeCleanup(
+    _i1.TestSessionBuilder sessionBuilder, [
+    String? params,
+  ]) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'recipesAdmin',
+            method: 'triggerDeletedRecipeCleanup',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'recipesAdmin',
+          methodName: 'triggerDeletedRecipeCleanup',
+          parameters: _i1.testObjectToJson({'params': params}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> scheduleDeletedRecipeCleanup(
+    _i1.TestSessionBuilder sessionBuilder, [
+    String? params,
+  ]) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'recipesAdmin',
+            method: 'scheduleDeletedRecipeCleanup',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'recipesAdmin',
+          methodName: 'scheduleDeletedRecipeCleanup',
+          parameters: _i1.testObjectToJson({'params': params}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> stopCleanupTask(
+    _i1.TestSessionBuilder sessionBuilder, [
+    String? params,
+  ]) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'recipesAdmin',
+            method: 'stopCleanupTask',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'recipesAdmin',
+          methodName: 'stopCleanupTask',
+          parameters: _i1.testObjectToJson({'params': params}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _RecipesEndpoint {
   _RecipesEndpoint(
     this._endpointDispatch,
@@ -676,5 +796,43 @@ class _RecipesEndpoint {
         await _localUniqueSession.close();
       }
     });
+  }
+}
+
+class _RecipesFutureCall {
+  Future<void> removeDeletedRecipes(
+    _i1.TestSessionBuilder sessionBuilder, [
+    String? params,
+  ]) async {
+    var object = _i7.RecipesFutureCallRemoveDeletedRecipesModel(params: params);
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i8.RecipesRemoveDeletedRecipesFutureCall().invoke(
+        _localUniqueSession,
+        object,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
+  }
+
+  Future<void> rescheduleRemoveDeletedRecipes(
+    _i1.TestSessionBuilder sessionBuilder, [
+    String? params,
+  ]) async {
+    var object = _i9.RecipesFutureCallRescheduleRemoveDeletedRecipesModel(
+      params: params,
+    );
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i8.RecipesRescheduleRemoveDeletedRecipesFutureCall().invoke(
+        _localUniqueSession,
+        object,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

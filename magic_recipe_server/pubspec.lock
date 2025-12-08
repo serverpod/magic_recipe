@@ -189,18 +189,18 @@ packages:
     dependency: "direct main"
     description:
       name: dartantic_ai
-      sha256: fee52da6f9c98cdc41ab8550982a66af85c21db81d433b41839a851bc9cecdde
+      sha256: "67bf5c0ff74f18e744bf2ba7e78ea024922a92a130a96811369988a5078f33c6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "2.0.0"
   dartantic_interface:
     dependency: "direct main"
     description:
       name: dartantic_interface
-      sha256: "0527564d60de6800713bfee54165b054ed750fc206a6f84b000e9c52e4ce35c3"
+      sha256: "4c6eac329920b3426dc6673604dd70cee2462317dad80e03cc2ad60fd3d8b7f9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "2.0.0"
   ed25519_edwards:
     dependency: transitive
     description:
@@ -277,50 +277,42 @@ packages:
     dependency: transitive
     description:
       name: google_cloud_ai_generativelanguage_v1beta
-      sha256: "5dfd0733d9e7c0535bb054ac9d0d6d0d92e4399cc7e0cfbf0753aa02d4442ad8"
+      sha256: "4a8a3347a0c862e995edc708e2dd2f7633c41f3e72b12ddc4172a0ca28438b0b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2"
-  google_cloud_gax:
-    dependency: transitive
-    description:
-      name: google_cloud_gax
-      sha256: fe1648255357f9558ad4d31c342b04cad7b84837bbfa225cbfac7767fa186ef8
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.2"
+    version: "0.2.0"
   google_cloud_longrunning:
     dependency: transitive
     description:
       name: google_cloud_longrunning
-      sha256: "5901bc32df1e588d22e415160fc117351bc6eda92effe5ce626913a41a7dabe3"
+      sha256: eb002af9c1e3e7d142a04134968a617d66245c580d2a0216fd8131bd4a1ab88e
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.2"
+    version: "0.2.0"
   google_cloud_protobuf:
     dependency: transitive
     description:
       name: google_cloud_protobuf
-      sha256: b7f80161de99b0e3a609b5d2e42cff0e95d9bdd5068ea1ce7cc33a401956f1b3
+      sha256: df16ec3dcb0aeaa06e0a96ee24f1c598b9f346ba0bee7b8fded0d95a0536fe23
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.2.0"
   google_cloud_rpc:
     dependency: transitive
     description:
       name: google_cloud_rpc
-      sha256: ef7da3b89a8eb55d7125e356eba4cc672b4f167d0eb2380d93c8297ebafbe4ae
+      sha256: "82d744d5d76c8e080873b2c481058aed263c7300f0b3346de131848aa1e3e592"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.2.0"
   google_cloud_type:
     dependency: transitive
     description:
       name: google_cloud_type
-      sha256: "41e93086da9e868ffac491bc78464aa5fe525746c0d86cc1057774a240289d50"
+      sha256: "7639412b51b6c85a09fd56d43e28250eb6e6a2249bfa3580626cef03d87f9643"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.2.0"
   google_identity_services_web:
     dependency: transitive
     description:
@@ -605,10 +597,10 @@ packages:
     dependency: transitive
     description:
       name: relic
-      sha256: "2aa3a842adc707dfc1856184348e0bfc2435cb5de47dada1dfd9da7e1837655b"
+      sha256: "400bc37b0ee5f8d02c911fb4213a5f3cb3f39496fc806c81f22ad25f1930bd15"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.0"
+    version: "0.14.0"
   retry:
     dependency: transitive
     description:
@@ -637,58 +629,58 @@ packages:
     dependency: "direct main"
     description:
       name: serverpod
-      sha256: "6069385873fe84e01bbb19aa8ef4b61745acc7567c8134c1c0c6df8bfdd60b34"
+      sha256: d2d05c742ad4c58aa495f4b14b97b14c7b0c7d972c044ebd8f219910185edb92
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.4"
+    version: "3.2.3"
   serverpod_auth_core_server:
     dependency: transitive
     description:
       name: serverpod_auth_core_server
-      sha256: ada463cd8c094d2dac60126e437670608515b9568940d893d4b61d4baf8f641d
+      sha256: "58f8551e827688db6061f51cc39b12d81b3e7f74038201888240f533c3a684ea"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.4"
+    version: "3.2.3"
   serverpod_auth_idp_server:
     dependency: "direct main"
     description:
       name: serverpod_auth_idp_server
-      sha256: "7aa139b73026edbbc3af5480670106746003aa7710856ee17b0ad90896b0cdd5"
+      sha256: fee6d14ae749d4b8073ebb038cb9f96fa98d891d7debbac17b061e68d7fca158
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.4"
+    version: "3.2.3"
   serverpod_lints:
     dependency: transitive
     description:
       name: serverpod_lints
-      sha256: "81056ad339b3f827ed6fdb7807a1071b59d263edb574eda9c85752d9f1134fa2"
+      sha256: "056b36016dec8564e0eebb6795c61c16deef32ba0277cf200e1ab72955573901"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.4"
+    version: "3.2.3"
   serverpod_serialization:
     dependency: transitive
     description:
       name: serverpod_serialization
-      sha256: "370e978b9d929aa84048fb12523fe2b1b2706f6ef4f58f7ec95f2383994c9f03"
+      sha256: "69d0b721c4b7d50b53861681e1c7d385a3def0be9a52e89fd3bd0c704fce0d37"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.4"
+    version: "3.2.3"
   serverpod_shared:
     dependency: transitive
     description:
       name: serverpod_shared
-      sha256: ed9ecf8af3976b167a012e15d98f38563c7d99e703f970cb6f4dbb014f77a89f
+      sha256: "95de5f3354c43c142277355f8aaac4243419a6ec1705f713cbd89210fdbbc8bb"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.4"
+    version: "3.2.3"
   serverpod_test:
     dependency: "direct dev"
     description:
       name: serverpod_test
-      sha256: bda378278d4134f36f2f050ef3ceef3b69b1f97fb8cf1fa46288277ada6bf256
+      sha256: "5d2795e1c31b965a85a11968d70cdeffd3df2d005b1bd95bbde26ad94df81199"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.4"
+    version: "3.2.3"
   shelf:
     dependency: transitive
     description:
@@ -753,6 +745,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.1"
+  sse:
+    dependency: transitive
+    description:
+      name: sse
+      sha256: fcc97470240bb37377f298e2bd816f09fd7216c07928641c0560719f50603643
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.8"
+  sse_channel:
+    dependency: transitive
+    description:
+      name: sse_channel
+      sha256: ad85fda353fae12533fd762dbd3ff275e710f216644e39459bf11a138124acad
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2"
   stack_trace:
     dependency: transitive
     description:
@@ -922,4 +930,4 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.9.0 <4.0.0"
+  dart: ">=3.9.2 <4.0.0"

@@ -166,12 +166,47 @@ class EndpointAdmin extends EndpointAdminEndpointBase {
 }
 
 /// {@category Endpoint}
+class EndpointRecipesAdmin extends EndpointAdminEndpointBase {
+  EndpointRecipesAdmin(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'recipesAdmin';
+
+  _i3.Future<void> triggerDeletedRecipeCleanup([String? params]) =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'triggerDeletedRecipeCleanup',
+        {'params': params},
+      );
+
+  _i3.Future<void> scheduleDeletedRecipeCleanup([String? params]) =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'scheduleDeletedRecipeCleanup',
+        {'params': params},
+      );
+
+  _i3.Future<void> stopCleanupTask([String? params]) =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'stopCleanupTask',
+        {'params': params},
+      );
+}
+
+/// This is the endpoint that will be used to generate a recipe using the
+/// Google Gemini API. It extends the Endpoint class and implements the
+/// generateRecipe method.
+/// Endpoint for AI-powered recipe generation using Gemini.
+/// Uses dependency-injected RecipeAIService, or falls back to API key from passwords.
+/// {@category Endpoint}
 class EndpointRecipes extends _i2.EndpointRef {
   EndpointRecipes(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'recipes';
 
+  /// Accepts a string containing ingredients and returns a generated Recipe.
   _i3.Future<_i5.Recipe> generateRecipe(String ingredients) =>
       caller.callServerEndpoint<_i5.Recipe>(
         'recipes',
@@ -179,6 +214,7 @@ class EndpointRecipes extends _i2.EndpointRef {
         {'ingredients': ingredients},
       );
 
+  /// Returns a list of all recipes.
   _i3.Future<List<_i5.Recipe>> getRecipes() =>
       caller.callServerEndpoint<List<_i5.Recipe>>(
         'recipes',
@@ -186,6 +222,7 @@ class EndpointRecipes extends _i2.EndpointRef {
         {},
       );
 
+  /// Delete a recipe by its [recipeId].
   _i3.Future<void> deleteRecipe(int recipeId) =>
       caller.callServerEndpoint<void>(
         'recipes',
@@ -237,6 +274,7 @@ class Client extends _i2.ServerpodClientShared {
        ) {
     emailIDP = EndpointEmailIDP(this);
     admin = EndpointAdmin(this);
+    recipesAdmin = EndpointRecipesAdmin(this);
     recipes = EndpointRecipes(this);
     modules = Modules(this);
   }
@@ -244,6 +282,8 @@ class Client extends _i2.ServerpodClientShared {
   late final EndpointEmailIDP emailIDP;
 
   late final EndpointAdmin admin;
+
+  late final EndpointRecipesAdmin recipesAdmin;
 
   late final EndpointRecipes recipes;
 
@@ -253,6 +293,7 @@ class Client extends _i2.ServerpodClientShared {
   Map<String, _i2.EndpointRef> get endpointRefLookup => {
     'emailIDP': emailIDP,
     'admin': admin,
+    'recipesAdmin': recipesAdmin,
     'recipes': recipes,
   };
 
