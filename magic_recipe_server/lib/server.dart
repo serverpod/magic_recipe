@@ -97,11 +97,3 @@ void _sendPasswordResetCode(
   // the user. For testing, we will just log the verification code.
   session.log('[EmailIDP] Password reset code ($email): $verificationCode');
 }
-
-/// Names of all future calls in the server.
-///
-/// This is better than using a string literal, as it will reduce the risk of
-/// typos and make it easier to refactor the code.
-enum FutureCallNames {
-  rescheduleRemoveDeletedRecipes,
-}
