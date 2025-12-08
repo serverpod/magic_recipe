@@ -29,11 +29,38 @@ void run(List<String> args) async {
     sendPasswordResetVerificationCode: _sendPasswordResetCode,
   );
 
+  // Configure user profile.
+  final userProfileConfig = UserProfileConfig(
+    onAfterUserProfileCreated:
+        (
+          Session session,
+          UserProfileModel userProfile, {
+          required transaction,
+        }) async {
+          final email = userProfile.email;
+          if (email == null) return;
+          if (!email.endsWith('serverpod.dev')) return;
+          // Add admin scope to the user
+          await AuthServices.instance.authUsers.update(
+            session,
+            authUserId: userProfile.authUserId,
+            scopes: {Scope.admin},
+            transaction: transaction,
+          );
+
+          session.log(
+            'User ${userProfile.email} created with admin scope',
+            level: LogLevel.info,
+          );
+        },
+  );
+
   pod.initializeAuthServices(
     tokenManagerBuilders: [
       serverSideSessionsConfig,
     ],
     identityProviderBuilders: [emailIdpConfig],
+    userProfileConfig: userProfileConfig,
   );
 
   // Setup a default page at the web root.
