@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "name": "magic_recipe",
+            "driver": "PostgreSQL",
+            "server": "localhost",
+            "port": 8090,
+            "database": "magic_recipe",
+            "username": "postgres",
+            "password": "serverpod",
+            "group": "Serverpod"
+        }
+    ]
+}
