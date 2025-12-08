@@ -9,6 +9,7 @@ environment:
 dependencies:
   serverpod: 3.0.0-rc.4
   dartantic_ai: 2.0.0
+  dartantic_interface: 2.0.0
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'

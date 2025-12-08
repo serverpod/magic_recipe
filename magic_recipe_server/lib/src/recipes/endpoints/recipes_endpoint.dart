@@ -1,41 +1,34 @@
-import 'package:dartantic_ai/dartantic_ai.dart';
+import 'package:magic_recipe_server/src/generated/protocol.dart';
+import 'package:magic_recipe_server/src/recipes/recipes.dart';
 import 'package:serverpod/serverpod.dart';
 
 /// This is the endpoint that will be used to generate a recipe using the
 /// Google Gemini API. It extends the Endpoint class and implements the
 /// generateRecipe method.
-class RecipeEndpoint extends Endpoint {
-  /// Pass in a string containing the ingredients and get a recipe back.
-  Future<String> generateRecipe(Session session, String ingredients) async {
-    // Serverpod automatically loads your passwords.yaml file and makes the passwords available
-    // in the session.passwords map.
-    final geminiApiKey = session.passwords['geminiApiKey'];
-    if (geminiApiKey == null) {
-      throw Exception('Gemini API key not found');
+/// Endpoint for AI-powered recipe generation using Gemini.
+/// Uses dependency-injected RecipeAIService, or falls back to API key from passwords.
+class RecipesEndpoint extends Endpoint {
+  /// Optionally pass in a custom AI service for testing/mocking.
+  RecipesEndpoint([RecipeAIService? aiService]) : _aiService = aiService;
+
+  final RecipeAIService? _aiService;
+
+  /// Gets the AI service, using the injected service if one was provided,
+  /// otherwise constructs a production RecipeAIService from the API key in passwords.
+  RecipeAIService _getAIService(Session session) {
+    if (_aiService != null) return _aiService;
+
+    final apiKey = session.passwords['geminiApiKey'];
+    if (apiKey == null) {
+      throw RecipeException('Gemini API key not configured');
     }
 
-    // Configure the Dartantic AI agent for Gemini before sending the prompt.
-    final agent = Agent.forProvider(
-      GoogleProvider(apiKey: geminiApiKey),
-      chatModelName: 'gemini-2.5-flash-lite',
-    );
+    return RecipeAIService.fromApiKey(apiKey);
+  }
 
-    // A prompt to generate a recipe, the user will provide a free text input with the ingredients.
-    final prompt =
-        'Generate a recipe using the following ingredients: $ingredients. '
-        'Always put the title of the recipe in the first line, and then the instructions. '
-        'The recipe should be easy to follow and include all necessary steps. '
-        'Please provide a detailed recipe.';
-
-    final response = await agent.send(prompt);
-
-    final responseText = response.output;
-
-    // Check if the response is empty.
-    if (responseText.isEmpty) {
-      throw Exception('No response from Gemini API');
-    }
-
-    return responseText;
+  /// Accepts a string containing ingredients and returns a generated Recipe.
+  Future<Recipe> generateRecipe(Session session, String ingredients) async {
+    final aiService = _getAIService(session);
+    return await aiService.generateRecipe(session, ingredients);
   }
 }

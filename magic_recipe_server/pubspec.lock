@@ -130,7 +130,7 @@ packages:
     source: hosted
     version: "1.2.0"
   dartantic_interface:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: dartantic_interface
       sha256: "0527564d60de6800713bfee54165b054ed750fc206a6f84b000e9c52e4ce35c3"
