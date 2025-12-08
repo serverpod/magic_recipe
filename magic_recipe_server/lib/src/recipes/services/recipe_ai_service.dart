@@ -20,9 +20,11 @@ Always put the title of the recipe in the first line, and then the instructions.
 
   /// Generates a recipe using the provided ingredients.
   ///
+  /// [userId] is required to associate the recipe with the user.
   /// [ingredients] must not be empty.
   Future<Recipe> generateRecipe(
     Session session,
+    String userId,
     String ingredients,
   ) async {
     _validateIngredients(ingredients);
@@ -41,6 +43,7 @@ Always put the title of the recipe in the first line, and then the instructions.
       text: response.output,
       date: DateTime.now(),
       ingredients: ingredients,
+      userId: userId,
     );
 
     final recipeWithId = await Recipe.db.insertRow(session, recipe);
