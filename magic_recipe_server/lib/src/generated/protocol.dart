@@ -13,6 +13,8 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'recipes/models/recipe.dart' as _i3;
+import 'package:magic_recipe_server/src/generated/recipes/models/recipe.dart'
+    as _i4;
 export 'recipes/models/recipe.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -114,6 +116,10 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i1.getType<_i3.Recipe?>()) {
       return (data != null ? _i3.Recipe.fromJson(data) : null) as T;
+    }
+    if (t == List<_i4.Recipe>) {
+      return (data as List).map((e) => deserialize<_i4.Recipe>(e)).toList()
+          as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);

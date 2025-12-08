@@ -12,6 +12,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'recipes/models/recipe.dart' as _i2;
+import 'package:magic_recipe_client/src/protocol/recipes/models/recipe.dart'
+    as _i3;
 export 'recipes/models/recipe.dart';
 export 'client.dart';
 
@@ -54,6 +56,10 @@ class Protocol extends _i1.SerializationManager {
     }
     if (t == _i1.getType<_i2.Recipe?>()) {
       return (data != null ? _i2.Recipe.fromJson(data) : null) as T;
+    }
+    if (t == List<_i3.Recipe>) {
+      return (data as List).map((e) => deserialize<_i3.Recipe>(e)).toList()
+          as T;
     }
     return super.deserialize<T>(data, t);
   }
