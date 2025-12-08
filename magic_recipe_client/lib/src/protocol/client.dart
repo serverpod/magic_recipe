@@ -43,6 +43,14 @@ class EndpointRecipes extends _i1.EndpointRef {
         'getRecipes',
         {},
       );
+
+  /// Delete a recipe by its [recipeId].
+  _i2.Future<void> deleteRecipe(int recipeId) =>
+      caller.callServerEndpoint<void>(
+        'recipes',
+        'deleteRecipe',
+        {'recipeId': recipeId},
+      );
 }
 
 class Client extends _i1.ServerpodClientShared {
