@@ -181,5 +181,43 @@ void main() {
         );
       },
     );
+
+    // New test for cache behavior
+    test('returns cached recipe if it exists', () async {
+      final ai = MockRecipeAIService();
+      final recipesEndpoint = RecipesEndpoint(ai);
+
+      final sessionBuilder = unAuthSessionBuilder.copyWith(
+        authentication: AuthenticationOverride.authenticationInfo('1', {}),
+      );
+
+      final session = sessionBuilder.build();
+
+      final ingredients = 'chicken, rice, broccoli';
+
+      // First call to populate the cache.
+      final recipe = await recipesEndpoint.generateRecipe(
+        session,
+        ingredients,
+      );
+
+      expect(recipe.text, 'Mock Recipe');
+      expect(ai.prompts.first, contains(ingredients));
+
+      // Cache should exist using appropriate key. HashCode is not stable across processes,
+      // so use the same cache key logic as in your implementation.
+      final cacheKey = 'recipe-$ingredients';
+      final cache = await session.caches.local.get<Recipe>(cacheKey);
+      expect(cache, isNotNull);
+      expect(cache?.text, 'Mock Recipe');
+
+      // Call the endpoint again with the same ingredients
+      final recipe2 = await recipesEndpoint.generateRecipe(
+        session,
+        ingredients,
+      );
+      expect(recipe2.text, 'Mock Recipe');
+      expect(recipe2.ingredients, equals(ingredients));
+    });
   });
 }
