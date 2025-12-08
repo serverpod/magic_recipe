@@ -12,8 +12,6 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
-import 'greeting.dart' as _i3;
-export 'greeting.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -53,12 +51,6 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
 
-    if (t == _i3.Greeting) {
-      return _i3.Greeting.fromJson(data) as T;
-    }
-    if (t == _i1.getType<_i3.Greeting?>()) {
-      return (data != null ? _i3.Greeting.fromJson(data) : null) as T;
-    }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
@@ -67,7 +59,6 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i3.Greeting => 'Greeting',
       _ => null,
     };
   }
@@ -84,10 +75,6 @@ class Protocol extends _i1.SerializationManagerServer {
       );
     }
 
-    switch (data) {
-      case _i3.Greeting():
-        return 'Greeting';
-    }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod.$className';
@@ -100,9 +87,6 @@ class Protocol extends _i1.SerializationManagerServer {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
-    }
-    if (dataClassName == 'Greeting') {
-      return deserialize<_i3.Greeting>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
