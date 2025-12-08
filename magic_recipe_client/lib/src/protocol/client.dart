@@ -245,6 +245,34 @@ class EndpointAdmin extends EndpointAdminEndpointBase {
       );
 }
 
+/// {@category Endpoint}
+class EndpointRecipesAdmin extends EndpointAdminEndpointBase {
+  EndpointRecipesAdmin(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'recipesAdmin';
+
+  _i3.Future<void> triggerDeletedRecipeCleanup() =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'triggerDeletedRecipeCleanup',
+        {},
+      );
+
+  _i3.Future<void> scheduleDeletedRecipeCleanup() =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'scheduleDeletedRecipeCleanup',
+        {},
+      );
+
+  _i3.Future<void> stopCleanupTask() => caller.callServerEndpoint<void>(
+    'recipesAdmin',
+    'stopCleanupTask',
+    {},
+  );
+}
+
 /// This is the endpoint that will be used to generate a recipe using the
 /// Google Gemini API. It extends the Endpoint class and implements the
 /// generateRecipe method.
@@ -322,6 +350,7 @@ class Client extends _i1.ServerpodClientShared {
        ) {
     emailIDP = EndpointEmailIDP(this);
     admin = EndpointAdmin(this);
+    recipesAdmin = EndpointRecipesAdmin(this);
     recipes = EndpointRecipes(this);
     modules = Modules(this);
   }
@@ -329,6 +358,8 @@ class Client extends _i1.ServerpodClientShared {
   late final EndpointEmailIDP emailIDP;
 
   late final EndpointAdmin admin;
+
+  late final EndpointRecipesAdmin recipesAdmin;
 
   late final EndpointRecipes recipes;
 
@@ -338,6 +369,7 @@ class Client extends _i1.ServerpodClientShared {
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
     'emailIDP': emailIDP,
     'admin': admin,
+    'recipesAdmin': recipesAdmin,
     'recipes': recipes,
   };
 

@@ -11,6 +11,10 @@ admin:
   - listAuthUsers:
   - blockUser:
   - unblockUser:
+recipesAdmin:
+  - triggerDeletedRecipeCleanup:
+  - scheduleDeletedRecipeCleanup:
+  - stopCleanupTask:
 recipes:
   - generateRecipe:
   - getRecipes:
