@@ -11,28 +11,28 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../greeting_endpoint.dart' as _i2;
+import '../recipes/recipes_endpoint.dart' as _i2;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'greeting': _i2.GreetingEndpoint()
+      'recipe': _i2.RecipeEndpoint()
         ..initialize(
           server,
-          'greeting',
+          'recipe',
           null,
         ),
     };
-    connectors['greeting'] = _i1.EndpointConnector(
-      name: 'greeting',
-      endpoint: endpoints['greeting']!,
+    connectors['recipe'] = _i1.EndpointConnector(
+      name: 'recipe',
+      endpoint: endpoints['recipe']!,
       methodConnectors: {
-        'hello': _i1.MethodConnector(
-          name: 'hello',
+        'generateRecipe': _i1.MethodConnector(
+          name: 'generateRecipe',
           params: {
-            'name': _i1.ParameterDescription(
-              name: 'name',
+            'ingredients': _i1.ParameterDescription(
+              name: 'ingredients',
               type: _i1.getType<String>(),
               nullable: false,
             ),
@@ -41,10 +41,11 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i2.GreetingEndpoint).hello(
-                session,
-                params['name'],
-              ),
+              ) async =>
+                  (endpoints['recipe'] as _i2.RecipeEndpoint).generateRecipe(
+                    session,
+                    params['ingredients'],
+                  ),
         ),
       },
     );
