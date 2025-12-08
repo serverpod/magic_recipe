@@ -21,6 +21,12 @@ import 'package:magic_recipe_client/src/protocol/recipes/models/recipe.dart'
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i6;
 import 'protocol.dart' as _i7;
 
+/// Base class for admin endpoints that require authentication and admin scope.
+/// {@category Endpoint}
+abstract class EndpointAdminEndpointBase extends _i2.EndpointRef {
+  EndpointAdminEndpointBase(_i2.EndpointCaller caller) : super(caller);
+}
+
 /// {@category Endpoint}
 class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
   EndpointEmailIDP(_i2.EndpointCaller caller) : super(caller);
@@ -28,15 +34,6 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
   @override
   String get name => 'emailIDP';
 
-  /// Logs in the user and returns a new session.
-  ///
-  /// Throws an [EmailAccountLoginException] in case of errors, with reason:
-  /// - [EmailAccountLoginExceptionReason.invalidCredentials] if the email or
-  ///   password is incorrect.
-  /// - [EmailAccountLoginExceptionReason.tooManyAttempts] if there have been
-  ///   too many failed login attempts.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
   @override
   _i3.Future<_i4.AuthSuccess> login({
     required String email,
@@ -50,16 +47,6 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
     },
   );
 
-  /// Starts the registration for a new user account with an email-based login
-  /// associated to it.
-  ///
-  /// Upon successful completion of this method, an email will have been
-  /// sent to [email] with a verification link, which the user must open to
-  /// complete the registration.
-  ///
-  /// Always returns a account request ID, which can be used to complete the
-  /// registration. If the email is already registered, the returned ID will not
-  /// be valid.
   @override
   _i3.Future<_i2.UuidValue> startRegistration({required String email}) =>
       caller.callServerEndpoint<_i2.UuidValue>(
@@ -68,16 +55,6 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
         {'email': email},
       );
 
-  /// Verifies an account request code and returns a token
-  /// that can be used to complete the account creation.
-  ///
-  /// Throws an [EmailAccountRequestException] in case of errors, with reason:
-  /// - [EmailAccountRequestExceptionReason.expired] if the account request has
-  ///   already expired.
-  /// - [EmailAccountRequestExceptionReason.policyViolation] if the password
-  ///   does not comply with the password policy.
-  /// - [EmailAccountRequestExceptionReason.invalid] if no request exists
-  ///   for the given [accountRequestId] or [verificationCode] is invalid.
   @override
   _i3.Future<String> verifyRegistrationCode({
     required _i2.UuidValue accountRequestId,
@@ -91,20 +68,6 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
     },
   );
 
-  /// Completes a new account registration, creating a new auth user with a
-  /// profile and attaching the given email account to it.
-  ///
-  /// Throws an [EmailAccountRequestException] in case of errors, with reason:
-  /// - [EmailAccountRequestExceptionReason.expired] if the account request has
-  ///   already expired.
-  /// - [EmailAccountRequestExceptionReason.policyViolation] if the password
-  ///   does not comply with the password policy.
-  /// - [EmailAccountRequestExceptionReason.invalid] if the [registrationToken]
-  ///   is invalid.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
-  ///
-  /// Returns a session for the newly created user.
   @override
   _i3.Future<_i4.AuthSuccess> finishRegistration({
     required String registrationToken,
@@ -118,19 +81,6 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
     },
   );
 
-  /// Requests a password reset for [email].
-  ///
-  /// If the email address is registered, an email with reset instructions will
-  /// be send out. If the email is unknown, this method will have no effect.
-  ///
-  /// Always returns a password reset request ID, which can be used to complete
-  /// the reset. If the email is not registered, the returned ID will not be
-  /// valid.
-  ///
-  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
-  /// - [EmailAccountPasswordResetExceptionReason.tooManyAttempts] if the user has
-  ///   made too many attempts trying to request a password reset.
-  ///
   @override
   _i3.Future<_i2.UuidValue> startPasswordReset({required String email}) =>
       caller.callServerEndpoint<_i2.UuidValue>(
@@ -139,20 +89,6 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
         {'email': email},
       );
 
-  /// Verifies a password reset code and returns a finishPasswordResetToken
-  /// that can be used to finish the password reset.
-  ///
-  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
-  /// - [EmailAccountPasswordResetExceptionReason.expired] if the password reset
-  ///   request has already expired.
-  /// - [EmailAccountPasswordResetExceptionReason.tooManyAttempts] if the user has
-  ///   made too many attempts trying to verify the password reset.
-  /// - [EmailAccountPasswordResetExceptionReason.invalid] if no request exists
-  ///   for the given [passwordResetRequestId] or [verificationCode] is invalid.
-  ///
-  /// If multiple steps are required to complete the password reset, this endpoint
-  /// should be overridden to return credentials for the next step instead
-  /// of the credentials for setting the password.
   @override
   _i3.Future<String> verifyPasswordResetCode({
     required _i2.UuidValue passwordResetRequestId,
@@ -166,20 +102,6 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
     },
   );
 
-  /// Completes a password reset request by setting a new password.
-  ///
-  /// The [verificationCode] returned from [verifyPasswordResetCode] is used to
-  /// validate the password reset request.
-  ///
-  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
-  /// - [EmailAccountPasswordResetExceptionReason.expired] if the password reset
-  ///   request has already expired.
-  /// - [EmailAccountPasswordResetExceptionReason.policyViolation] if the new
-  ///   password does not comply with the password policy.
-  /// - [EmailAccountPasswordResetExceptionReason.invalid] if no request exists
-  ///   for the given [passwordResetRequestId] or [verificationCode] is invalid.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
   @override
   _i3.Future<void> finishPasswordReset({
     required String finishPasswordResetToken,
@@ -201,11 +123,48 @@ class EndpointEmailIDP extends _i1.EndpointEmailIdpBase {
   );
 }
 
-/// This is the endpoint that will be used to generate a recipe using the
-/// Google Gemini API. It extends the Endpoint class and implements the
-/// generateRecipe method.
-/// Endpoint for AI-powered recipe generation using Gemini.
-/// Uses dependency-injected RecipeAIService, or falls back to API key from passwords.
+/// Endpoint for managing admin users.
+/// {@category Endpoint}
+class EndpointAdmin extends EndpointAdminEndpointBase {
+  EndpointAdmin(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'admin';
+
+  _i3.Future<
+    List<({_i4.AuthUserModel authUser, _i4.UserProfileModel userProfile})>
+  >
+  listUsers() =>
+      caller.callServerEndpoint<
+        List<({_i4.AuthUserModel authUser, _i4.UserProfileModel userProfile})>
+      >(
+        'admin',
+        'listUsers',
+        {},
+      );
+
+  _i3.Future<List<_i4.AuthUserModel>> listAuthUsers() =>
+      caller.callServerEndpoint<List<_i4.AuthUserModel>>(
+        'admin',
+        'listAuthUsers',
+        {},
+      );
+
+  _i3.Future<void> blockUser(_i2.UuidValue userId) =>
+      caller.callServerEndpoint<void>(
+        'admin',
+        'blockUser',
+        {'userId': userId},
+      );
+
+  _i3.Future<void> unblockUser(_i2.UuidValue userId) =>
+      caller.callServerEndpoint<void>(
+        'admin',
+        'unblockUser',
+        {'userId': userId},
+      );
+}
+
 /// {@category Endpoint}
 class EndpointRecipes extends _i2.EndpointRef {
   EndpointRecipes(_i2.EndpointCaller caller) : super(caller);
@@ -213,7 +172,6 @@ class EndpointRecipes extends _i2.EndpointRef {
   @override
   String get name => 'recipes';
 
-  /// Accepts a string containing ingredients and returns a generated Recipe.
   _i3.Future<_i5.Recipe> generateRecipe(String ingredients) =>
       caller.callServerEndpoint<_i5.Recipe>(
         'recipes',
@@ -221,7 +179,6 @@ class EndpointRecipes extends _i2.EndpointRef {
         {'ingredients': ingredients},
       );
 
-  /// Returns a list of all recipes.
   _i3.Future<List<_i5.Recipe>> getRecipes() =>
       caller.callServerEndpoint<List<_i5.Recipe>>(
         'recipes',
@@ -229,7 +186,6 @@ class EndpointRecipes extends _i2.EndpointRef {
         {},
       );
 
-  /// Delete a recipe by its [recipeId].
   _i3.Future<void> deleteRecipe(int recipeId) =>
       caller.callServerEndpoint<void>(
         'recipes',
@@ -280,11 +236,14 @@ class Client extends _i2.ServerpodClientShared {
              disconnectStreamsOnLostInternetConnection,
        ) {
     emailIDP = EndpointEmailIDP(this);
+    admin = EndpointAdmin(this);
     recipes = EndpointRecipes(this);
     modules = Modules(this);
   }
 
   late final EndpointEmailIDP emailIDP;
+
+  late final EndpointAdmin admin;
 
   late final EndpointRecipes recipes;
 
@@ -293,6 +252,7 @@ class Client extends _i2.ServerpodClientShared {
   @override
   Map<String, _i2.EndpointRef> get endpointRefLookup => {
     'emailIDP': emailIDP,
+    'admin': admin,
     'recipes': recipes,
   };
 

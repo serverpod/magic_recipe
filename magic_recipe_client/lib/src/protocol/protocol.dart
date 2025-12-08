@@ -62,6 +62,59 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i2.Recipe?>()) {
       return (data != null ? _i2.Recipe.fromJson(data) : null) as T;
     }
+    if (t ==
+        List<
+          ({_i3.AuthUserModel authUser, _i3.UserProfileModel userProfile})
+        >) {
+      return (data as List)
+              .map(
+                (e) =>
+                    deserialize<
+                      ({
+                        _i3.AuthUserModel authUser,
+                        _i3.UserProfileModel userProfile,
+                      })
+                    >(e),
+              )
+              .toList()
+          as T;
+    }
+    if (t ==
+        _i1
+            .getType<
+              ({_i3.AuthUserModel authUser, _i3.UserProfileModel userProfile})
+            >()) {
+      return (
+            authUser: deserialize<_i3.AuthUserModel>(
+              ((data as Map)['n'] as Map)['authUser'],
+            ),
+            userProfile: deserialize<_i3.UserProfileModel>(
+              data['n']['userProfile'],
+            ),
+          )
+          as T;
+    }
+    if (t ==
+        _i1
+            .getType<
+              ({_i3.AuthUserModel authUser, _i3.UserProfileModel userProfile})
+            >()) {
+      return (
+            authUser: deserialize<_i3.AuthUserModel>(
+              ((data as Map)['n'] as Map)['authUser'],
+            ),
+            userProfile: deserialize<_i3.UserProfileModel>(
+              data['n']['userProfile'],
+            ),
+          )
+          as T;
+    }
+    if (t == List<_i3.AuthUserModel>) {
+      return (data as List)
+              .map((e) => deserialize<_i3.AuthUserModel>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_i4.Recipe>) {
       return (data as List).map((e) => deserialize<_i4.Recipe>(e)).toList()
           as T;
@@ -142,6 +195,15 @@ class Protocol extends _i1.SerializationManager {
 
   @override
   dynamic mapRecordToJson(Record record) {
+    if (record
+        is ({_i3.AuthUserModel authUser, _i3.UserProfileModel userProfile})) {
+      return {
+        "n": {
+          "authUser": record.authUser,
+          "userProfile": record.userProfile,
+        },
+      };
+    }
     try {
       return _i5.Protocol().mapRecordToJson(record);
     } catch (_) {}
