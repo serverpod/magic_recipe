@@ -1,0 +1,8 @@
+class: Recipe
+fields:
+    author: String
+    text: String
+    ### The creation date of the recipe
+    date: DateTime
+    ingredients: String
+    
