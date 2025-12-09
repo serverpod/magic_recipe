@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magic_recipe_client/magic_recipe_client.dart';
 import 'package:magic_recipe_flutter/main.dart';
 import 'package:magic_recipe_flutter/pages/pages.dart';
+import 'package:magic_recipe_flutter/widgets/widgets.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -25,6 +26,7 @@ class MyHomePageState extends State<MyHomePage> {
   String? _errorMessage;
 
   final _ingredientsController = TextEditingController();
+  String? _imagePath;
 
   bool _isLoading = false;
 
@@ -63,6 +65,7 @@ class MyHomePageState extends State<MyHomePage> {
       });
       final result = await client.recipes.generateRecipe(
         _ingredientsController.text,
+        _imagePath,
       );
       setState(() {
         _errorMessage = null;
@@ -109,10 +112,12 @@ class MyHomePageState extends State<MyHomePage> {
             flex: 3,
             child: RecipeGeneratorPanel(
               ingredientsController: _ingredientsController,
+              imagePath: _imagePath,
               isLoading: _isLoading,
               recipe: _recipe,
               errorMessage: _errorMessage,
               onGenerateRecipe: _generateRecipe,
+              onImagePathChanged: (path) => setState(() => _imagePath = path),
             ),
           ),
         ],
@@ -124,6 +129,7 @@ class MyHomePageState extends State<MyHomePage> {
     setState(() {
       _errorMessage = null;
       _ingredientsController.text = recipe.ingredients;
+      _imagePath = recipe.imagePath;
       _recipe = recipe;
     });
   }
@@ -222,18 +228,22 @@ class RecipeListTile extends StatelessWidget {
 /// RecipeGeneratorPanel contains the input fields and controls for the recipe generator.
 class RecipeGeneratorPanel extends StatelessWidget {
   final TextEditingController ingredientsController;
+  final String? imagePath;
   final bool isLoading;
   final Recipe? recipe;
   final String? errorMessage;
   final VoidCallback onGenerateRecipe;
+  final ValueChanged<String?> onImagePathChanged;
 
   const RecipeGeneratorPanel({
     super.key,
     required this.ingredientsController,
+    required this.imagePath,
     required this.isLoading,
     required this.recipe,
     required this.errorMessage,
     required this.onGenerateRecipe,
+    required this.onImagePathChanged,
   });
 
   @override
@@ -255,7 +265,9 @@ class RecipeGeneratorPanel extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: RecipeControls(
               isLoading: isLoading,
+              imagePath: imagePath,
               onGenerateRecipe: onGenerateRecipe,
+              onImagePathChanged: onImagePathChanged,
             ),
           ),
           Expanded(
@@ -275,12 +287,16 @@ class RecipeGeneratorPanel extends StatelessWidget {
 /// RecipeControls contains the buttons for the recipe generator.
 class RecipeControls extends StatelessWidget {
   final bool isLoading;
+  final String? imagePath;
   final VoidCallback onGenerateRecipe;
+  final ValueChanged<String?> onImagePathChanged;
 
   const RecipeControls({
     super.key,
     required this.isLoading,
+    required this.imagePath,
     required this.onGenerateRecipe,
+    required this.onImagePathChanged,
   });
 
   @override
@@ -291,6 +307,11 @@ class RecipeControls extends StatelessWidget {
         ElevatedButton(
           onPressed: isLoading ? null : onGenerateRecipe,
           child: Text(isLoading ? 'Loading...' : 'Send to Server'),
+        ),
+        ImageUploadButton(
+          key: ValueKey(imagePath),
+          onImagePathChanged: onImagePathChanged,
+          imagePath: imagePath,
         ),
       ],
     );

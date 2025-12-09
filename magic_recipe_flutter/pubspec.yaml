@@ -27,6 +27,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   flutter:
     sdk: flutter
+  image_picker: ^1.2.1
   magic_recipe_client:
     path: ../magic_recipe_client
   serverpod_auth_idp_flutter: ^3.0.0-rc.4
