@@ -38,6 +38,22 @@ class RecipesEndpoint extends Endpoint {
     return userId;
   }
 
+  Stream<Recipe> generateRecipeStream(
+    Session session,
+    String ingredients, [
+    String? imagePath,
+  ]) async* {
+    final aiService = _getAIService(session);
+    final userId = _getUserId(session);
+
+    yield* aiService.generateRecipeStream(
+      session,
+      userId,
+      ingredients,
+      imagePath,
+    );
+  }
+
   /// Accepts a string containing ingredients and returns a generated Recipe.
   Future<Recipe> generateRecipe(
     Session session,

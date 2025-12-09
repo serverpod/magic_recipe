@@ -70,6 +70,54 @@ Always put the title of the recipe in the first line, and then the instructions.
     );
   }
 
+  /// Generates a recipe stream using the provided ingredients and optional image.
+  ///
+  /// Handles caching, generation, and persistence automatically.
+  /// [userId] is required to associate the recipe with the user.
+  /// [ingredients] must not be empty.
+  /// [imagePath] is optional and should be a valid path to an uploaded image.
+  Stream<Recipe> generateRecipeStream(
+    Session session,
+    String userId,
+    String ingredients,
+    String? imagePath,
+  ) async* {
+    _validateIngredients(ingredients);
+
+    final cacheKey = generateCacheKey(ingredients, imagePath);
+
+    // Check cache first
+    final cached = await _getCachedRecipe(session, cacheKey, userId);
+    if (cached != null) {
+      yield cached;
+      return;
+    }
+
+    // Get the attachments if they exist.
+    final attachments = await _getAttachments(session, imagePath);
+
+    var recipe = Recipe(
+      author: 'Gemini',
+      text: '',
+      date: DateTime.now(),
+      ingredients: ingredients,
+      userId: userId,
+      imagePath: imagePath,
+    );
+
+    await for (final chunk in generateContentStream(
+      _buildTextPrompt(ingredients),
+      attachments: attachments,
+    )) {
+      recipe = recipe.copyWith(text: recipe.text + chunk.output);
+      yield recipe;
+    }
+
+    // Save and yield final recipe
+    final saved = await _saveRecipe(session, recipe, userId, cacheKey);
+    yield saved;
+  }
+
   String _buildTextPrompt(String ingredients) {
     return 'Generate a recipe using the following ingredients: $ingredients. '
         '$_recipeInstructions';
@@ -85,6 +133,12 @@ Always put the title of the recipe in the first line, and then the instructions.
   Future<ChatResult<String>> generateContent(
     String prompt, {
     List<Part> attachments = const [],
+  });
+
+  /// Generates content stream using the AI service.
+  Stream<ChatResult<String>> generateContentStream(
+    String prompt, {
+    List<DataPart> attachments = const [],
   });
 
   /// Builds the prompt for the AI service.
@@ -179,6 +233,17 @@ class ProductionRecipeAIService extends RecipeAIService {
     List<Part> attachments = const [],
   }) {
     return _agent.send(
+      prompt,
+      attachments: attachments,
+    );
+  }
+
+  @override
+  Stream<ChatResult<String>> generateContentStream(
+    String prompt, {
+    List<DataPart> attachments = const [],
+  }) {
+    return _agent.sendStream(
       prompt,
       attachments: attachments,
     );
