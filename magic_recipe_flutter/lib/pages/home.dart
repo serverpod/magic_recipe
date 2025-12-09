@@ -57,28 +57,35 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   void _generateRecipe() async {
+    setState(() {
+      _errorMessage = null;
+      _recipe = null;
+      _isLoading = true;
+    });
+
     try {
-      setState(() {
-        _errorMessage = null;
-        _recipe = null;
-        _isLoading = true;
-      });
-      final result = await client.recipes.generateRecipe(
+      final stream = client.recipes.generateRecipeStream(
         _ingredientsController.text,
         _imagePath,
       );
-      setState(() {
-        _errorMessage = null;
-        _recipe = result;
-        _recipeHistory.insert(0, result);
-        _isLoading = false;
-      });
+
+      await for (final recipe in stream) {
+        setState(() {
+          _recipe = recipe;
+          _errorMessage = null;
+        });
+      }
+
+      if (_recipe != null) {
+        setState(() => _recipeHistory.insert(0, _recipe!));
+      }
     } catch (e) {
       setState(() {
-        _errorMessage = '$e';
+        _errorMessage = 'Failed to generate recipe: $e';
         _recipe = null;
-        _isLoading = false;
       });
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
