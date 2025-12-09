@@ -78,6 +78,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: true,
           dartType: 'String?',
         ),
+        _i2.ColumnDefinition(
+          name: 'imagePath',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -190,6 +196,15 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == List<_i6.Recipe>) {
       return (data as List).map((e) => deserialize<_i6.Recipe>(e)).toList()
+          as T;
+    }
+    if (t == _i1.getType<(String?, String)>()) {
+      return (
+            ((data as Map)['p'] as List)[0] == null
+                ? null
+                : deserialize<String>(data['p'][0]),
+            deserialize<String>(data['p'][1]),
+          )
           as T;
     }
     try {
@@ -317,6 +332,14 @@ Map<String, dynamic>? mapRecordToJson(Record? record) {
         "authUser": record.authUser,
         "userProfile": record.userProfile,
       },
+    };
+  }
+  if (record is (String?, String)) {
+    return {
+      "p": [
+        record.$1,
+        record.$2,
+      ],
     };
   }
   throw Exception('Unsupported record type ${record.runtimeType}');

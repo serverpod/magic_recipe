@@ -19,3 +19,6 @@ recipes:
   - generateRecipe:
   - getRecipes:
   - deleteRecipe:
+  - getUploadDescription:
+  - verifyUpload:
+  - getPublicUrlForPath:
