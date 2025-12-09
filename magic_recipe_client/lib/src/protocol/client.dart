@@ -207,12 +207,17 @@ class EndpointRecipes extends _i2.EndpointRef {
   String get name => 'recipes';
 
   /// Accepts a string containing ingredients and returns a generated Recipe.
-  _i3.Future<_i5.Recipe> generateRecipe(String ingredients) =>
-      caller.callServerEndpoint<_i5.Recipe>(
-        'recipes',
-        'generateRecipe',
-        {'ingredients': ingredients},
-      );
+  _i3.Future<_i5.Recipe> generateRecipe(
+    String ingredients, [
+    String? imagePath,
+  ]) => caller.callServerEndpoint<_i5.Recipe>(
+    'recipes',
+    'generateRecipe',
+    {
+      'ingredients': ingredients,
+      'imagePath': imagePath,
+    },
+  );
 
   /// Returns a list of all recipes.
   _i3.Future<List<_i5.Recipe>> getRecipes() =>
@@ -228,6 +233,26 @@ class EndpointRecipes extends _i2.EndpointRef {
         'recipes',
         'deleteRecipe',
         {'recipeId': recipeId},
+      );
+
+  _i3.Future<(String?, String)> getUploadDescription(String filename) =>
+      caller.callServerEndpoint<(String?, String)>(
+        'recipes',
+        'getUploadDescription',
+        {'filename': filename},
+      );
+
+  _i3.Future<bool> verifyUpload(String path) => caller.callServerEndpoint<bool>(
+    'recipes',
+    'verifyUpload',
+    {'path': path},
+  );
+
+  _i3.Future<String> getPublicUrlForPath(String path) =>
+      caller.callServerEndpoint<String>(
+        'recipes',
+        'getPublicUrlForPath',
+        {'path': path},
       );
 }
 

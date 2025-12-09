@@ -10,4 +10,6 @@ fields:
     deletedAt: DateTime?, scope=serverOnly
     ### The user id of the user who created the recipe
     userId: String?, scope=serverOnly
+    ### Image path of the user upload
+    imagePath: String?
     
