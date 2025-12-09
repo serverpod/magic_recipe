@@ -17,4 +17,14 @@ class MockRecipeAIService extends RecipeAIService {
     this.attachments.addAll(attachments);
     return Future.value(ChatResult<String>(output: output));
   }
+
+  @override
+  Stream<ChatResult<String>> generateContentStream(
+    String prompt, {
+    List<DataPart> attachments = const [],
+  }) {
+    prompts.add(prompt);
+    this.attachments.addAll(attachments);
+    return Stream.value(ChatResult<String>(output: output));
+  }
 }
