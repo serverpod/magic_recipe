@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:dartantic_interface/dartantic_interface.dart';
 import 'package:magic_recipe_server/src/generated/protocol.dart';
 import 'package:magic_recipe_server/src/recipes/recipes.dart';
 import 'package:test/test.dart';
@@ -206,7 +209,7 @@ void main() {
 
       // Cache should exist using appropriate key. HashCode is not stable across processes,
       // so use the same cache key logic as in your implementation.
-      final cacheKey = 'recipe-$ingredients';
+      final cacheKey = ai.generateCacheKey(ingredients, null);
       final cache = await session.caches.local.get<Recipe>(cacheKey);
       expect(cache, isNotNull);
       expect(cache?.text, 'Mock Recipe');
@@ -219,5 +222,51 @@ void main() {
       expect(recipe2.text, 'Mock Recipe');
       expect(recipe2.ingredients, equals(ingredients));
     });
+
+    test(
+      'when calling generateRecipe with imagePath, attachments are passed to AI service',
+      () async {
+        final ai = MockRecipeAIService();
+        final recipesEndpoint = RecipesEndpoint(ai);
+
+        final sessionBuilder = unAuthSessionBuilder.copyWith(
+          authentication: AuthenticationOverride.authenticationInfo('1', {}),
+        );
+        final session = sessionBuilder.build();
+
+        // Create a test image file in storage
+        const testImagePath = 'test/image.jpg';
+        final testImageData = Uint8List.fromList(
+          List<int>.generate(100, (i) => i % 256),
+        );
+        await session.storage.storeFile(
+          storageId: 'public',
+          path: testImagePath,
+          byteData: testImageData.buffer.asByteData(),
+        );
+
+        final ingredients = 'chicken, rice, broccoli';
+
+        // Clear attachments from previous calls
+        ai.attachments.clear();
+
+        // Generate recipe with image
+        final recipe = await recipesEndpoint.generateRecipe(
+          session,
+          ingredients,
+          testImagePath,
+        );
+
+        // Verify recipe was generated
+        expect(recipe.text, 'Mock Recipe');
+        expect(recipe.imagePath, testImagePath);
+
+        // Verify attachments were passed to the AI service
+        expect(ai.attachments.length, 1);
+        expect(ai.attachments.first, isA<DataPart>());
+        final dataPart = ai.attachments.first as DataPart;
+        expect(dataPart.mimeType, 'image/jpeg');
+      },
+    );
   });
 }
