@@ -1,5 +1,4 @@
 import 'package:dartantic_ai/dartantic_ai.dart';
-import 'package:dartantic_interface/dartantic_interface.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:magic_recipe_server/src/generated/protocol.dart';
 import 'package:magic_recipe_server/src/recipes/recipes.dart';

@@ -1,3 +1,12 @@
+emailIDP:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+  - hasAccount:
 recipes:
   - generateRecipe:
   - getRecipes:
