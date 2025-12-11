@@ -11,19 +11,199 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../recipes/endpoints/recipes_endpoint.dart' as _i2;
+import '../auth/email_idp_endpoint.dart' as _i2;
+import '../recipes/endpoints/recipes_endpoint.dart' as _i3;
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+    as _i4;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _i5;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'recipes': _i2.RecipesEndpoint()
+      'emailIDP': _i2.EmailIDPEndpoint()
+        ..initialize(
+          server,
+          'emailIDP',
+          null,
+        ),
+      'recipes': _i3.RecipesEndpoint()
         ..initialize(
           server,
           'recipes',
           null,
         ),
     };
+    connectors['emailIDP'] = _i1.EndpointConnector(
+      name: 'emailIDP',
+      endpoint: endpoints['emailIDP']!,
+      methodConnectors: {
+        'login': _i1.MethodConnector(
+          name: 'login',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIDP'] as _i2.EmailIDPEndpoint).login(
+                session,
+                email: params['email'],
+                password: params['password'],
+              ),
+        ),
+        'startRegistration': _i1.MethodConnector(
+          name: 'startRegistration',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIDP'] as _i2.EmailIDPEndpoint)
+                  .startRegistration(
+                    session,
+                    email: params['email'],
+                  ),
+        ),
+        'verifyRegistrationCode': _i1.MethodConnector(
+          name: 'verifyRegistrationCode',
+          params: {
+            'accountRequestId': _i1.ParameterDescription(
+              name: 'accountRequestId',
+              type: _i1.getType<_i1.UuidValue>(),
+              nullable: false,
+            ),
+            'verificationCode': _i1.ParameterDescription(
+              name: 'verificationCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIDP'] as _i2.EmailIDPEndpoint)
+                  .verifyRegistrationCode(
+                    session,
+                    accountRequestId: params['accountRequestId'],
+                    verificationCode: params['verificationCode'],
+                  ),
+        ),
+        'finishRegistration': _i1.MethodConnector(
+          name: 'finishRegistration',
+          params: {
+            'registrationToken': _i1.ParameterDescription(
+              name: 'registrationToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIDP'] as _i2.EmailIDPEndpoint)
+                  .finishRegistration(
+                    session,
+                    registrationToken: params['registrationToken'],
+                    password: params['password'],
+                  ),
+        ),
+        'startPasswordReset': _i1.MethodConnector(
+          name: 'startPasswordReset',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIDP'] as _i2.EmailIDPEndpoint)
+                  .startPasswordReset(
+                    session,
+                    email: params['email'],
+                  ),
+        ),
+        'verifyPasswordResetCode': _i1.MethodConnector(
+          name: 'verifyPasswordResetCode',
+          params: {
+            'passwordResetRequestId': _i1.ParameterDescription(
+              name: 'passwordResetRequestId',
+              type: _i1.getType<_i1.UuidValue>(),
+              nullable: false,
+            ),
+            'verificationCode': _i1.ParameterDescription(
+              name: 'verificationCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIDP'] as _i2.EmailIDPEndpoint)
+                  .verifyPasswordResetCode(
+                    session,
+                    passwordResetRequestId: params['passwordResetRequestId'],
+                    verificationCode: params['verificationCode'],
+                  ),
+        ),
+        'finishPasswordReset': _i1.MethodConnector(
+          name: 'finishPasswordReset',
+          params: {
+            'finishPasswordResetToken': _i1.ParameterDescription(
+              name: 'finishPasswordResetToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'newPassword': _i1.ParameterDescription(
+              name: 'newPassword',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIDP'] as _i2.EmailIDPEndpoint)
+                  .finishPasswordReset(
+                    session,
+                    finishPasswordResetToken:
+                        params['finishPasswordResetToken'],
+                    newPassword: params['newPassword'],
+                  ),
+        ),
+      },
+    );
     connectors['recipes'] = _i1.EndpointConnector(
       name: 'recipes',
       endpoint: endpoints['recipes']!,
@@ -42,7 +222,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['recipes'] as _i2.RecipesEndpoint).generateRecipe(
+                  (endpoints['recipes'] as _i3.RecipesEndpoint).generateRecipe(
                     session,
                     params['ingredients'],
                   ),
@@ -54,7 +234,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['recipes'] as _i2.RecipesEndpoint)
+              ) async => (endpoints['recipes'] as _i3.RecipesEndpoint)
                   .getRecipes(session),
         ),
         'deleteRecipe': _i1.MethodConnector(
@@ -71,12 +251,16 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['recipes'] as _i2.RecipesEndpoint).deleteRecipe(
+                  (endpoints['recipes'] as _i3.RecipesEndpoint).deleteRecipe(
                     session,
                     params['recipeId'],
                   ),
         ),
       },
     );
+    modules['serverpod_auth_idp'] = _i4.Endpoints()
+      ..initializeEndpoints(server);
+    modules['serverpod_auth_core'] = _i5.Endpoints()
+      ..initializeEndpoints(server);
   }
 }
