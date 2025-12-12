@@ -1,9 +1,9 @@
-import 'package:magic_recipe_server/src/web/widgets/built_with_serverpod_page.dart';
+import 'package:magic_recipe_server/src/web/widgets/flutter_web_page.dart';
 import 'package:serverpod/serverpod.dart';
 
 class RootRoute extends WidgetRoute {
   @override
-  Future<TemplateWidget> build(Session session, Request request) async {
-    return BuiltWithServerpodPageWidget();
+  Future<WebWidget> build(Session session, Request request) async {
+    return FlutterWebPage();
   }
 }
