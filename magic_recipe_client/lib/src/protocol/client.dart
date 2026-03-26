@@ -10,9 +10,9 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
-    as _i1;
-import 'package:serverpod_client/serverpod_client.dart' as _i2;
+    as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
@@ -20,12 +20,18 @@ import 'package:magic_recipe_client/src/protocol/recipes/models/recipe.dart'
     as _i5;
 import 'protocol.dart' as _i6;
 
+/// Base class for admin endpoints that require authentication and admin scope.
+/// {@category Endpoint}
+abstract class EndpointAdminEndpointBase extends _i1.EndpointRef {
+  EndpointAdminEndpointBase(_i1.EndpointCaller caller) : super(caller);
+}
+
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
 /// on the client.
 /// {@category Endpoint}
-class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
-  EndpointEmailIdp(_i2.EndpointCaller caller) : super(caller);
+class EndpointEmailIdp extends _i2.EndpointEmailIdpBase {
+  EndpointEmailIdp(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'emailIdp';
@@ -63,8 +69,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// registration. If the email is already registered, the returned ID will not
   /// be valid.
   @override
-  _i3.Future<_i2.UuidValue> startRegistration({required String email}) =>
-      caller.callServerEndpoint<_i2.UuidValue>(
+  _i3.Future<_i1.UuidValue> startRegistration({required String email}) =>
+      caller.callServerEndpoint<_i1.UuidValue>(
         'emailIdp',
         'startRegistration',
         {'email': email},
@@ -82,7 +88,7 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///   for the given [accountRequestId] or [verificationCode] is invalid.
   @override
   _i3.Future<String> verifyRegistrationCode({
-    required _i2.UuidValue accountRequestId,
+    required _i1.UuidValue accountRequestId,
     required String verificationCode,
   }) => caller.callServerEndpoint<String>(
     'emailIdp',
@@ -134,8 +140,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///   made too many attempts trying to request a password reset.
   ///
   @override
-  _i3.Future<_i2.UuidValue> startPasswordReset({required String email}) =>
-      caller.callServerEndpoint<_i2.UuidValue>(
+  _i3.Future<_i1.UuidValue> startPasswordReset({required String email}) =>
+      caller.callServerEndpoint<_i1.UuidValue>(
         'emailIdp',
         'startPasswordReset',
         {'email': email},
@@ -157,7 +163,7 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// of the credentials for setting the password.
   @override
   _i3.Future<String> verifyPasswordResetCode({
-    required _i2.UuidValue passwordResetRequestId,
+    required _i1.UuidValue passwordResetRequestId,
     required String verificationCode,
   }) => caller.callServerEndpoint<String>(
     'emailIdp',
@@ -203,11 +209,57 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   );
 }
 
+/// Endpoint for managing admin users.
+/// {@category Endpoint}
+class EndpointAdmin extends EndpointAdminEndpointBase {
+  EndpointAdmin(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'admin';
+
+  /// List all admin users.
+  _i3.Future<
+    List<({_i4.AuthUserModel authUser, _i4.UserProfileModel userProfile})>
+  >
+  listUsers() =>
+      caller.callServerEndpoint<
+        List<({_i4.AuthUserModel authUser, _i4.UserProfileModel userProfile})>
+      >(
+        'admin',
+        'listUsers',
+        {},
+      );
+
+  /// List all auth users.
+  _i3.Future<List<_i4.AuthUserModel>> listAuthUsers() =>
+      caller.callServerEndpoint<List<_i4.AuthUserModel>>(
+        'admin',
+        'listAuthUsers',
+        {},
+      );
+
+  /// Block a user by its [userId].
+  _i3.Future<void> blockUser(_i1.UuidValue userId) =>
+      caller.callServerEndpoint<void>(
+        'admin',
+        'blockUser',
+        {'userId': userId},
+      );
+
+  /// Unblock a user by its [userId].
+  _i3.Future<void> unblockUser(_i1.UuidValue userId) =>
+      caller.callServerEndpoint<void>(
+        'admin',
+        'unblockUser',
+        {'userId': userId},
+      );
+}
+
 /// By extending [RefreshJwtTokensEndpoint], the JWT token refresh endpoint
 /// is made available on the server and enables automatic token refresh on the client.
 /// {@category Endpoint}
 class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
-  EndpointJwtRefresh(_i2.EndpointCaller caller) : super(caller);
+  EndpointJwtRefresh(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'jwtRefresh';
@@ -244,8 +296,8 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
 /// Endpoint for AI-powered recipe generation using Gemini.
 /// Uses dependency-injected RecipeAIService, or falls back to API key from passwords.
 /// {@category Endpoint}
-class EndpointRecipes extends _i2.EndpointRef {
-  EndpointRecipes(_i2.EndpointCaller caller) : super(caller);
+class EndpointRecipes extends _i1.EndpointRef {
+  EndpointRecipes(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'recipes';
@@ -277,16 +329,16 @@ class EndpointRecipes extends _i2.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    serverpod_auth_idp = _i1.Caller(client);
+    serverpod_auth_idp = _i2.Caller(client);
     serverpod_auth_core = _i4.Caller(client);
   }
 
-  late final _i1.Caller serverpod_auth_idp;
+  late final _i2.Caller serverpod_auth_idp;
 
   late final _i4.Caller serverpod_auth_core;
 }
 
-class Client extends _i2.ServerpodClientShared {
+class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
@@ -297,12 +349,12 @@ class Client extends _i2.ServerpodClientShared {
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
     Function(
-      _i2.MethodCallContext,
+      _i1.MethodCallContext,
       Object,
       StackTrace,
     )?
     onFailedCall,
-    Function(_i2.MethodCallContext)? onSucceededCall,
+    Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
@@ -316,12 +368,15 @@ class Client extends _i2.ServerpodClientShared {
              disconnectStreamsOnLostInternetConnection,
        ) {
     emailIdp = EndpointEmailIdp(this);
+    admin = EndpointAdmin(this);
     jwtRefresh = EndpointJwtRefresh(this);
     recipes = EndpointRecipes(this);
     modules = Modules(this);
   }
 
   late final EndpointEmailIdp emailIdp;
+
+  late final EndpointAdmin admin;
 
   late final EndpointJwtRefresh jwtRefresh;
 
@@ -330,14 +385,15 @@ class Client extends _i2.ServerpodClientShared {
   late final Modules modules;
 
   @override
-  Map<String, _i2.EndpointRef> get endpointRefLookup => {
+  Map<String, _i1.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
+    'admin': admin,
     'jwtRefresh': jwtRefresh,
     'recipes': recipes,
   };
 
   @override
-  Map<String, _i2.ModuleEndpointCaller> get moduleLookup => {
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {
     'serverpod_auth_idp': modules.serverpod_auth_idp,
     'serverpod_auth_core': modules.serverpod_auth_core,
   };
