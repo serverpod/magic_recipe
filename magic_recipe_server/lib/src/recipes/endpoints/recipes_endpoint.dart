@@ -36,11 +36,20 @@ class RecipesEndpoint extends Endpoint {
   }
 
   /// Accepts a string containing ingredients and returns a generated Recipe.
-  Future<Recipe> generateRecipe(Session session, String ingredients) async {
+  Future<Recipe> generateRecipe(
+    Session session,
+    String ingredients, [
+    String? imagePath,
+  ]) async {
     final aiService = _getAIService(session);
     final userId = _getUserId(session);
 
-    return await aiService.generateRecipe(session, userId, ingredients);
+    return await aiService.generateRecipe(
+      session,
+      userId,
+      ingredients,
+      imagePath,
+    );
   }
 
   /// Returns a list of all recipes.
@@ -74,5 +83,38 @@ class RecipesEndpoint extends Endpoint {
       session,
       recipe.copyWith(deletedAt: DateTime.now()),
     );
+  }
+
+  Future<(String? description, String path)> getUploadDescription(
+    Session session,
+    String filename,
+  ) async {
+    const Uuid uuid = Uuid();
+
+    final path = 'uploads/${uuid.v4()}/$filename';
+
+    final description = await session.storage.createDirectFileUploadDescription(
+      storageId: 'public',
+      path: path,
+    );
+
+    return (description, path);
+  }
+
+  Future<bool> verifyUpload(Session session, String path) async {
+    return await session.storage.verifyDirectFileUpload(
+      storageId: 'public',
+      path: path,
+    );
+  }
+
+  Future<String> getPublicUrlForPath(Session session, String path) async {
+    final publicUrl = await session.storage.getPublicUrl(
+      storageId: 'public',
+      path: path,
+    );
+
+    session.log('Public URL:\n$publicUrl');
+    return publicUrl.toString();
   }
 }

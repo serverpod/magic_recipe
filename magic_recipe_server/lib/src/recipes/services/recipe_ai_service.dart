@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dartantic_ai/dartantic_ai.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:magic_recipe_server/src/generated/protocol.dart';
@@ -14,6 +16,7 @@ abstract class RecipeAIService {
     return ProductionRecipeAIService(apiKey: apiKey);
   }
 
+  static const _storageId = 'public';
   static const _cacheLifetime = Duration(days: 1);
   static const _recipeInstructions = '''
 Always put the title of the recipe in the first line, and then the instructions. The recipe should be easy to follow and include all necessary steps. Please provide a detailed recipe. Only put the title in the first line, no markup.''';
@@ -22,22 +25,27 @@ Always put the title of the recipe in the first line, and then the instructions.
   ///
   /// [userId] is required to associate the recipe with the user.
   /// [ingredients] must not be empty.
+  /// [imagePath] is optional and should be a valid path to an uploaded image.
   Future<Recipe> generateRecipe(
     Session session,
     String userId,
     String ingredients,
+    String? imagePath,
   ) async {
     _validateIngredients(ingredients);
 
-    final cacheKey = generateCacheKey(ingredients);
+    final cacheKey = generateCacheKey(ingredients, imagePath);
 
     // Get the cached recipe if it exists.
     final cached = await _getCachedRecipe(session, cacheKey, userId);
     if (cached != null) return cached;
 
+    // Get the attachments if they exist.
+    final attachments = await _getAttachments(session, imagePath);
+
     final response = await generateContent(
       _buildTextPrompt(ingredients),
-      attachments: [],
+      attachments: attachments,
     );
 
     if (response.output.isEmpty) {
@@ -50,9 +58,15 @@ Always put the title of the recipe in the first line, and then the instructions.
       date: DateTime.now(),
       ingredients: ingredients,
       userId: userId,
+      imagePath: imagePath,
     );
 
-    return await _saveRecipe(session, recipe, userId, cacheKey);
+    return await _saveRecipe(
+      session,
+      recipe,
+      userId,
+      cacheKey,
+    );
   }
 
   String _buildTextPrompt(String ingredients) {
@@ -72,9 +86,34 @@ Always put the title of the recipe in the first line, and then the instructions.
     List<Part> attachments = const [],
   });
 
+  /// Builds the prompt for the AI service.
+  Future<List<DataPart>> _getAttachments(
+    Session session,
+    String? imagePath,
+  ) async {
+    if (imagePath == null) return [];
+
+    final imageData = await _loadImage(session, imagePath);
+    return [DataPart(imageData, mimeType: 'image/jpeg')];
+  }
+
+  /// Loads an image from the storage.
+  Future<Uint8List> _loadImage(Session session, String path) async {
+    final imageData = await session.storage.retrieveFile(
+      storageId: _storageId,
+      path: path,
+    );
+
+    if (imageData == null) {
+      throw RecipeException('Image not found: $path');
+    }
+
+    return imageData.buffer.asUint8List();
+  }
+
   /// Generates a cache key for the given ingredients.
-  String generateCacheKey(String ingredients) {
-    return 'recipe-$ingredients';
+  String generateCacheKey(String ingredients, String? imagePath) {
+    return 'recipe-$ingredients${imagePath ?? ''}';
   }
 
   /// Gets a cached recipe if available, otherwise returns null.
