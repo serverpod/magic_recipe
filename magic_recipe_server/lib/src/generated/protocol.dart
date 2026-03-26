@@ -16,6 +16,8 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
+import 'recipes/models/recipe.dart' as _i5;
+export 'recipes/models/recipe.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -57,6 +59,12 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
 
+    if (t == _i5.Recipe) {
+      return _i5.Recipe.fromJson(data) as T;
+    }
+    if (t == _i1.getType<_i5.Recipe?>()) {
+      return (data != null ? _i5.Recipe.fromJson(data) : null) as T;
+    }
     try {
       return _i3.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
@@ -71,6 +79,7 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _i5.Recipe => 'Recipe',
       _ => null,
     };
   }
@@ -87,6 +96,10 @@ class Protocol extends _i1.SerializationManagerServer {
       );
     }
 
+    switch (data) {
+      case _i5.Recipe():
+        return 'Recipe';
+    }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod.$className';
@@ -107,6 +120,9 @@ class Protocol extends _i1.SerializationManagerServer {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'Recipe') {
+      return deserialize<_i5.Recipe>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
