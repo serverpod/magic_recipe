@@ -6,6 +6,7 @@ class MockRecipeAIService extends RecipeAIService {
 
   final String output;
   final List<String> prompts = [];
+  final List<Part> attachments = [];
 
   @override
   Future<ChatResult<String>> generateContent(
@@ -13,6 +14,7 @@ class MockRecipeAIService extends RecipeAIService {
     List<Part> attachments = const [],
   }) {
     prompts.add(prompt);
+    this.attachments.addAll(attachments);
     return Future.value(ChatResult<String>(output: output));
   }
 }
