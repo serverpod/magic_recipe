@@ -13,7 +13,7 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
-import '../greetings/greeting_endpoint.dart' as _i4;
+import '../recipes/endpoints/recipes_endpoint.dart' as _i4;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i5;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -35,10 +35,10 @@ class Endpoints extends _i1.EndpointDispatch {
           'jwtRefresh',
           null,
         ),
-      'greeting': _i4.GreetingEndpoint()
+      'recipe': _i4.RecipeEndpoint()
         ..initialize(
           server,
-          'greeting',
+          'recipe',
           null,
         ),
     };
@@ -246,15 +246,15 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    connectors['greeting'] = _i1.EndpointConnector(
-      name: 'greeting',
-      endpoint: endpoints['greeting']!,
+    connectors['recipe'] = _i1.EndpointConnector(
+      name: 'recipe',
+      endpoint: endpoints['recipe']!,
       methodConnectors: {
-        'hello': _i1.MethodConnector(
-          name: 'hello',
+        'generateRecipe': _i1.MethodConnector(
+          name: 'generateRecipe',
           params: {
-            'name': _i1.ParameterDescription(
-              name: 'name',
+            'ingredients': _i1.ParameterDescription(
+              name: 'ingredients',
               type: _i1.getType<String>(),
               nullable: false,
             ),
@@ -263,10 +263,11 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i4.GreetingEndpoint).hello(
-                session,
-                params['name'],
-              ),
+              ) async =>
+                  (endpoints['recipe'] as _i4.RecipeEndpoint).generateRecipe(
+                    session,
+                    params['ingredients'],
+                  ),
         ),
       },
     );
