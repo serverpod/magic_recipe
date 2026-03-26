@@ -17,6 +17,31 @@ void run(List<String> args) async {
   // Initialize authentication services for the server.
   // Token managers will be used to validate and issue authentication keys,
   // and the identity providers will be the authentication options available for users.
+  // Configure user profile.
+  final userProfileConfig = UserProfileConfig(
+    onAfterUserProfileCreated: (
+      Session session,
+      UserProfileModel userProfile, {
+      required transaction,
+    }) async {
+      final email = userProfile.email;
+      if (email == null) return;
+      if (!email.endsWith('serverpod.dev')) return;
+      // Add admin scope to the user
+      await AuthServices.instance.authUsers.update(
+        session,
+        authUserId: userProfile.authUserId,
+        scopes: {Scope.admin},
+        transaction: transaction,
+      );
+
+      session.log(
+        'User ${userProfile.email} created with admin scope',
+        level: LogLevel.info,
+      );
+    },
+  );
+
   pod.initializeAuthServices(
     tokenManagerBuilders: [
       // Use JWT for authentication keys towards the server.
@@ -29,6 +54,7 @@ void run(List<String> args) async {
         sendPasswordResetVerificationCode: _sendPasswordResetCode,
       ),
     ],
+    userProfileConfig: userProfileConfig,
   );
 
   // Setup a default page at the web root.
