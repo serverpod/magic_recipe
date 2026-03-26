@@ -11,3 +11,4 @@ jwtRefresh:
   - refreshAccessToken:
 recipes:
   - generateRecipe:
+  - getRecipes:

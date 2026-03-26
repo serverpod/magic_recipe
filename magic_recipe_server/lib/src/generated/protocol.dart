@@ -17,6 +17,8 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
 import 'recipes/models/recipe.dart' as _i5;
+import 'package:magic_recipe_server/src/generated/recipes/models/recipe.dart'
+    as _i6;
 export 'recipes/models/recipe.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -120,6 +122,10 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i1.getType<_i5.Recipe?>()) {
       return (data != null ? _i5.Recipe.fromJson(data) : null) as T;
+    }
+    if (t == List<_i6.Recipe>) {
+      return (data as List).map((e) => deserialize<_i6.Recipe>(e)).toList()
+          as T;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);
