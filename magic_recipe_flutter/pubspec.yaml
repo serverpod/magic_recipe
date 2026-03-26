@@ -32,6 +32,8 @@ dependencies:
   magic_recipe_client:
     path: ../magic_recipe_client
   serverpod_auth_idp_flutter: 3.3.1
+  serverpod_auth_shared_flutter: 3.3.1
+  serverpod_auth_email_flutter: 3.3.1
   serverpod_flutter: 3.3.1
 
 dev_dependencies:

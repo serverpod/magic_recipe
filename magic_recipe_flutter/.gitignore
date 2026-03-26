@@ -44,3 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+
+# Desktop platforms - not needed for this project
+/linux/
+/macos/
+/windows/
