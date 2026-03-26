@@ -16,6 +16,8 @@ import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
+import 'package:magic_recipe_server/src/generated/recipes/models/recipe.dart'
+    as _i5;
 import 'package:magic_recipe_server/src/generated/protocol.dart';
 import 'package:magic_recipe_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -127,7 +129,7 @@ class TestEndpoints {
 
   late final _JwtRefreshEndpoint jwtRefresh;
 
-  late final _RecipeEndpoint recipe;
+  late final _RecipesEndpoint recipes;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -145,7 +147,7 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
-    recipe = _RecipeEndpoint(
+    recipes = _RecipesEndpoint(
       endpoints,
       serializationManager,
     );
@@ -470,8 +472,8 @@ class _JwtRefreshEndpoint {
   }
 }
 
-class _RecipeEndpoint {
-  _RecipeEndpoint(
+class _RecipesEndpoint {
+  _RecipesEndpoint(
     this._endpointDispatch,
     this._serializationManager,
   );
@@ -480,20 +482,20 @@ class _RecipeEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<String> generateRecipe(
+  _i3.Future<_i5.Recipe> generateRecipe(
     _i1.TestSessionBuilder sessionBuilder,
     String ingredients,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'recipe',
+            endpoint: 'recipes',
             method: 'generateRecipe',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'recipe',
+          endpointPath: 'recipes',
           methodName: 'generateRecipe',
           parameters: _i1.testObjectToJson({'ingredients': ingredients}),
           serializationManager: _serializationManager,
@@ -503,7 +505,7 @@ class _RecipeEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<String>);
+                as _i3.Future<_i5.Recipe>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

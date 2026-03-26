@@ -16,7 +16,9 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'protocol.dart' as _i5;
+import 'package:magic_recipe_client/src/protocol/recipes/models/recipe.dart'
+    as _i5;
+import 'protocol.dart' as _i6;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -239,20 +241,19 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   );
 }
 
-/// This is the endpoint that will be used to generate a recipe using the
-/// Google Gemini API. It extends the Endpoint class and implements the
-/// generateRecipe method.
+/// Endpoint for AI-powered recipe generation using Gemini.
+/// Uses dependency-injected RecipeAIService, or falls back to API key from passwords.
 /// {@category Endpoint}
-class EndpointRecipe extends _i2.EndpointRef {
-  EndpointRecipe(_i2.EndpointCaller caller) : super(caller);
+class EndpointRecipes extends _i2.EndpointRef {
+  EndpointRecipes(_i2.EndpointCaller caller) : super(caller);
 
   @override
-  String get name => 'recipe';
+  String get name => 'recipes';
 
-  /// Pass in a string containing the ingredients and get a recipe back.
-  _i3.Future<String> generateRecipe(String ingredients) =>
-      caller.callServerEndpoint<String>(
-        'recipe',
+  /// Accepts a string containing ingredients and returns a generated Recipe.
+  _i3.Future<_i5.Recipe> generateRecipe(String ingredients) =>
+      caller.callServerEndpoint<_i5.Recipe>(
+        'recipes',
         'generateRecipe',
         {'ingredients': ingredients},
       );
@@ -289,7 +290,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i5.Protocol(),
+         _i6.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -300,7 +301,7 @@ class Client extends _i2.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
-    recipe = EndpointRecipe(this);
+    recipes = EndpointRecipes(this);
     modules = Modules(this);
   }
 
@@ -308,7 +309,7 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointJwtRefresh jwtRefresh;
 
-  late final EndpointRecipe recipe;
+  late final EndpointRecipes recipes;
 
   late final Modules modules;
 
@@ -316,7 +317,7 @@ class Client extends _i2.ServerpodClientShared {
   Map<String, _i2.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
-    'recipe': recipe,
+    'recipes': recipes,
   };
 
   @override

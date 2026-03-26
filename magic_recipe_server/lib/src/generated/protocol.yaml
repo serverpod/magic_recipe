@@ -9,5 +9,5 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
-recipe:
+recipes:
   - generateRecipe:
