@@ -181,5 +181,38 @@ void main() {
         );
       },
     );
+
+    test('returns cached recipe if it exists', () async {
+      final ai = MockRecipeAIService();
+      final recipesEndpoint = RecipesEndpoint(ai);
+
+      final sessionBuilder = unAuthSessionBuilder.copyWith(
+        authentication: AuthenticationOverride.authenticationInfo('1', {}),
+      );
+
+      final session = sessionBuilder.build();
+
+      final ingredients = 'chicken, rice, broccoli';
+
+      final recipe = await recipesEndpoint.generateRecipe(
+        session,
+        ingredients,
+      );
+
+      expect(recipe.text, 'Mock Recipe');
+      expect(ai.prompts.first, contains(ingredients));
+
+      final cacheKey = 'recipe-$ingredients';
+      final cache = await session.caches.local.get<Recipe>(cacheKey);
+      expect(cache, isNotNull);
+      expect(cache?.text, 'Mock Recipe');
+
+      final recipe2 = await recipesEndpoint.generateRecipe(
+        session,
+        ingredients,
+      );
+      expect(recipe2.text, 'Mock Recipe');
+      expect(recipe2.ingredients, equals(ingredients));
+    });
   });
 }
