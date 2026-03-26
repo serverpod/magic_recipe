@@ -16,9 +16,13 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
-import 'recipes/models/recipe.dart' as _i5;
-import 'package:magic_recipe_server/src/generated/recipes/models/recipe.dart'
+import 'future_calls_generated_models/recipes_future_call_remove_deleted_recipes_model.dart'
+    as _i5;
+import 'future_calls_generated_models/recipes_future_call_reschedule_remove_deleted_recipes_model.dart'
     as _i6;
+import 'recipes/models/recipe.dart' as _i7;
+import 'package:magic_recipe_server/src/generated/recipes/models/recipe.dart'
+    as _i8;
 export 'recipes/models/recipe.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -129,11 +133,38 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
 
-    if (t == _i5.Recipe) {
-      return _i5.Recipe.fromJson(data) as T;
+    if (t == _i5.RecipesFutureCallRemoveDeletedRecipesModel) {
+      return _i5.RecipesFutureCallRemoveDeletedRecipesModel.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i5.Recipe?>()) {
-      return (data != null ? _i5.Recipe.fromJson(data) : null) as T;
+    if (t == _i6.RecipesFutureCallRescheduleRemoveDeletedRecipesModel) {
+      return _i6.RecipesFutureCallRescheduleRemoveDeletedRecipesModel.fromJson(
+            data,
+          )
+          as T;
+    }
+    if (t == _i7.Recipe) {
+      return _i7.Recipe.fromJson(data) as T;
+    }
+    if (t == _i1.getType<_i5.RecipesFutureCallRemoveDeletedRecipesModel?>()) {
+      return (data != null
+              ? _i5.RecipesFutureCallRemoveDeletedRecipesModel.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t ==
+        _i1
+            .getType<
+              _i6.RecipesFutureCallRescheduleRemoveDeletedRecipesModel?
+            >()) {
+      return (data != null
+              ? _i6.RecipesFutureCallRescheduleRemoveDeletedRecipesModel.fromJson(
+                  data,
+                )
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i7.Recipe?>()) {
+      return (data != null ? _i7.Recipe.fromJson(data) : null) as T;
     }
     if (t ==
         List<
@@ -188,8 +219,8 @@ class Protocol extends _i1.SerializationManagerServer {
               .toList()
           as T;
     }
-    if (t == List<_i6.Recipe>) {
-      return (data as List).map((e) => deserialize<_i6.Recipe>(e)).toList()
+    if (t == List<_i8.Recipe>) {
+      return (data as List).map((e) => deserialize<_i8.Recipe>(e)).toList()
           as T;
     }
     try {
@@ -206,7 +237,11 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i5.Recipe => 'Recipe',
+      _i5.RecipesFutureCallRemoveDeletedRecipesModel =>
+        'RecipesFutureCallRemoveDeletedRecipesModel',
+      _i6.RecipesFutureCallRescheduleRemoveDeletedRecipesModel =>
+        'RecipesFutureCallRescheduleRemoveDeletedRecipesModel',
+      _i7.Recipe => 'Recipe',
       _ => null,
     };
   }
@@ -224,7 +259,11 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i5.Recipe():
+      case _i5.RecipesFutureCallRemoveDeletedRecipesModel():
+        return 'RecipesFutureCallRemoveDeletedRecipesModel';
+      case _i6.RecipesFutureCallRescheduleRemoveDeletedRecipesModel():
+        return 'RecipesFutureCallRescheduleRemoveDeletedRecipesModel';
+      case _i7.Recipe():
         return 'Recipe';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -248,8 +287,19 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'RecipesFutureCallRemoveDeletedRecipesModel') {
+      return deserialize<_i5.RecipesFutureCallRemoveDeletedRecipesModel>(
+        data['data'],
+      );
+    }
+    if (dataClassName ==
+        'RecipesFutureCallRescheduleRemoveDeletedRecipesModel') {
+      return deserialize<
+        _i6.RecipesFutureCallRescheduleRemoveDeletedRecipesModel
+      >(data['data']);
+    }
     if (dataClassName == 'Recipe') {
-      return deserialize<_i5.Recipe>(data['data']);
+      return deserialize<_i7.Recipe>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -287,8 +337,8 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i5.Recipe:
-        return _i5.Recipe.t;
+      case _i7.Recipe:
+        return _i7.Recipe.t;
     }
     return null;
   }

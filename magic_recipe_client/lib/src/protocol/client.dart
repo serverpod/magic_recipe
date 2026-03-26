@@ -293,6 +293,35 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   );
 }
 
+/// {@category Endpoint}
+class EndpointRecipesAdmin extends EndpointAdminEndpointBase {
+  EndpointRecipesAdmin(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'recipesAdmin';
+
+  _i3.Future<void> triggerDeletedRecipeCleanup([String? params]) =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'triggerDeletedRecipeCleanup',
+        {'params': params},
+      );
+
+  _i3.Future<void> scheduleDeletedRecipeCleanup([String? params]) =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'scheduleDeletedRecipeCleanup',
+        {'params': params},
+      );
+
+  _i3.Future<void> stopCleanupTask([String? params]) =>
+      caller.callServerEndpoint<void>(
+        'recipesAdmin',
+        'stopCleanupTask',
+        {'params': params},
+      );
+}
+
 /// Endpoint for AI-powered recipe generation using Gemini.
 /// Uses dependency-injected RecipeAIService, or falls back to API key from passwords.
 /// {@category Endpoint}
@@ -370,6 +399,7 @@ class Client extends _i1.ServerpodClientShared {
     emailIdp = EndpointEmailIdp(this);
     admin = EndpointAdmin(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    recipesAdmin = EndpointRecipesAdmin(this);
     recipes = EndpointRecipes(this);
     modules = Modules(this);
   }
@@ -380,6 +410,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointJwtRefresh jwtRefresh;
 
+  late final EndpointRecipesAdmin recipesAdmin;
+
   late final EndpointRecipes recipes;
 
   late final Modules modules;
@@ -389,6 +421,7 @@ class Client extends _i1.ServerpodClientShared {
     'emailIdp': emailIdp,
     'admin': admin,
     'jwtRefresh': jwtRefresh,
+    'recipesAdmin': recipesAdmin,
     'recipes': recipes,
   };
 

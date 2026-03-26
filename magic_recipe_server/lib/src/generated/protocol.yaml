@@ -14,6 +14,10 @@ admin:
   - unblockUser:
 jwtRefresh:
   - refreshAccessToken:
+recipesAdmin:
+  - triggerDeletedRecipeCleanup:
+  - scheduleDeletedRecipeCleanup:
+  - stopCleanupTask:
 recipes:
   - generateRecipe:
   - getRecipes:
