@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "magic_recipe_flutter",
+            "cwd": "${workspaceFolder}/magic_recipe_flutter",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "magic_recipe_server",
+            "cwd": "${workspaceFolder}/magic_recipe_server",
+            "request": "launch",
+            "type": "dart",
+            "preLaunchTask": "docker_compose_up",
+            "program": "bin/main.dart",
+            "env": {
+                "SERVERPOD_PASSWORD_database": "Bmt8hKM_2gKgNu5z3gowciLPy-kiw8hn"
+            },
+            "args": [
+                "--apply-migrations"
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "magic_recipe (full stack)",
+            "configurations": [
+                "magic_recipe_server",
+                "magic_recipe_flutter"
+            ],
+            "presentation": {
+                "order": 1
+            }
+        }
+    ]
+}
