@@ -19,6 +19,7 @@ recipesAdmin:
   - scheduleDeletedRecipeCleanup:
   - stopCleanupTask:
 recipes:
+  - generateRecipeStream:
   - generateRecipe:
   - getRecipes:
   - deleteRecipe:
