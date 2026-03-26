@@ -56,6 +56,9 @@ class MyHomePageState extends State<MyHomePage> {
   /// Holds the last result or null if no result exists yet.
   Recipe? _recipe;
 
+  /// Holds the recipe history.
+  List<Recipe> _recipeHistory = [];
+
   /// Holds the last error message that we've received from the server or null if no
   /// error exists yet.
   String? _errorMessage;
@@ -64,6 +67,21 @@ class MyHomePageState extends State<MyHomePage> {
 
   bool _loading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadRecipeHistory();
+  }
+
+  Future<void> _loadRecipeHistory() async {
+    try {
+      final recipes = await client.recipes.getRecipes();
+      setState(() => _recipeHistory = recipes);
+    } catch (e) {
+      setState(() => _errorMessage = 'Failed to load recipes: $e');
+    }
+  }
+
   void _callGenerateRecipe() async {
     try {
       setState(() {
@@ -71,12 +89,13 @@ class MyHomePageState extends State<MyHomePage> {
         _recipe = null;
         _loading = true;
       });
-      final result = await client.recipe.generateRecipe(
+      final result = await client.recipes.generateRecipe(
         _textEditingController.text,
       );
       setState(() {
         _errorMessage = null;
         _recipe = result;
+        _recipeHistory.insert(0, result);
         _loading = false;
       });
     } catch (e) {
@@ -94,52 +113,88 @@ class MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: TextField(
-                controller: _textEditingController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your ingredients',
-                ),
+      body: Row(
+        children: [
+          Expanded(
+            child: DecoratedBox(
+              decoration: BoxDecoration(color: Colors.grey[300]),
+              child: ListView.builder(
+                itemCount: _recipeHistory.length,
+                itemBuilder: (context, index) {
+                  final recipe = _recipeHistory[index];
+                  final firstLineEnd = recipe.text.indexOf('\n');
+                  final title = firstLineEnd != -1
+                      ? recipe.text.substring(0, firstLineEnd)
+                      : recipe.text;
+                  return ListTile(
+                    title: Text(title),
+                    subtitle: Text('${recipe.author} - ${recipe.date}'),
+                    onTap: () {
+                      setState(() {
+                        _recipe = recipe;
+                        _textEditingController.text = recipe.ingredients;
+                      });
+                    },
+                  );
+                },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ElevatedButton(
-                onPressed: _loading ? null : _callGenerateRecipe,
-                child: _loading
-                    ? const Text('Loading...')
-                    : const Text('Generate Recipe'),
+          ),
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: TextField(
+                      controller: _textEditingController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your ingredients',
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: ElevatedButton(
+                      onPressed: _loading ? null : _callGenerateRecipe,
+                      child: _loading
+                          ? const Text('Loading...')
+                          : const Text('Generate Recipe'),
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: ResultDisplay(
+                        resultMessage: _recipe != null
+                            ? '${_recipe?.author} on ${_recipe?.date}:\n${_recipe?.text}'
+                            : null,
+                        errorMessage: _errorMessage,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: ResultDisplay(
-                  resultMessage: _recipe != null
-                      ? '${_recipe?.author} on ${_recipe?.date}:\n${_recipe?.text}'
-                      : null,
-                  errorMessage: _errorMessage,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-/// ResultDisplays shows the result of the call. Either the returned result
-/// from the `example.greeting` endpoint method or an error message.
+/// ResultDisplay shows the result of the call: either the returned result from
+/// the recipes endpoint method or an error message.
 class ResultDisplay extends StatelessWidget {
   final String? resultMessage;
   final String? errorMessage;
 
-  const ResultDisplay({super.key, this.resultMessage, this.errorMessage});
+  const ResultDisplay({
+    super.key,
+    this.resultMessage,
+    this.errorMessage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +215,9 @@ class ResultDisplay extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 50),
       child: Container(
         color: backgroundColor,
-        child: Center(child: Text(text)),
+        child: Center(
+          child: Text(text),
+        ),
       ),
     );
   }
