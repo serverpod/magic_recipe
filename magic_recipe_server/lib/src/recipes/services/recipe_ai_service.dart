@@ -42,7 +42,8 @@ Always put the title of the recipe in the first line, and then the instructions.
       ingredients: ingredients,
     );
 
-    return recipe;
+    final recipeWithId = await Recipe.db.insertRow(session, recipe);
+    return recipeWithId;
   }
 
   String _buildTextPrompt(String ingredients) {
