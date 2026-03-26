@@ -12,3 +12,4 @@ jwtRefresh:
 recipes:
   - generateRecipe:
   - getRecipes:
+  - deleteRecipe:

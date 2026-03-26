@@ -265,6 +265,14 @@ class EndpointRecipes extends _i2.EndpointRef {
         'getRecipes',
         {},
       );
+
+  /// Delete a recipe by its [recipeId].
+  _i3.Future<void> deleteRecipe(int recipeId) =>
+      caller.callServerEndpoint<void>(
+        'recipes',
+        'deleteRecipe',
+        {'recipeId': recipeId},
+      );
 }
 
 class Modules {
